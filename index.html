@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slippi Doubles Stats</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #eee;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 90vh; /* Ensure the body takes up at least the full viewport height */
+        }
+
+        #startButton {
+            background-color: #4CAF50; /* Green color */
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: bold;
+            text-shadow: 1px 0 2px rgb(0, 0, 0);
+        }
+
+        #startButton:hover {
+            background-color: #57cc5b;
+        }
+        
+        #refreshButton {
+            background-color: #f0f0f0;
+            color: #333;
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 10px; 
+            cursor: pointer;
+            margin-left: 5px; /* Add margin to the right */
+        }
+
+        #refreshButton:hover {
+            background-color: #d7d7d7; /* Slightly darker gray on hover */
+        }
+
+        #startButton, #refreshButton {
+            float: left; /* Float left */
+        }
+
+        #selectFolderButton {
+            /* Apply common button styles */
+            background-color: #555;
+            color: #eee;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s ease; /* Add transition effect */
+            float: right; /* Float right */
+        }
+
+        #selectFolderButton:hover {
+            /* Add hover effect */
+            background-color: #666;
+        }
+
+        #openFolderButton {
+            background-color: #555;
+            color: #eee;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s ease; /* Add transition effect */
+            float: right;
+            margin-right: 5px;
+        }
+
+        #openFolderButton:hover {
+            background-color: #666;
+        }
+
+        /* Loading bar styles */
+        #loading-container {
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #loading-text {
+            margin-bottom: 10px;
+        }
+
+        #loading-bar {
+            width: 80%; /* Adjust the width as needed */
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin: 20px auto;
+        }
+
+        #progress {
+            width: 0%; /* Set initial width to 0% */
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            transition: width 0.3s ease-in-out; /* Adjust the animation speed as needed */
+        }
+
+        #tableContainer {
+            margin-top: 20px;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 10px; /* Rounded corners */
+            overflow: hidden; /* Hide overflow content */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow effect */
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background-color: #333;
+            color: #eee;
+        }
+
+        th, td {
+            border: 1px solid #555;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #444;
+        }
+
+        button {
+            background-color: #555;
+            color: #eee;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease; /* Add transition effect */
+        }
+
+        button:hover {
+            background-color: #666;
+        }
+
+        /* header connect code text styling */
+        .connect-code {
+            text-shadow: 0 0 4px;
+        }
+
+        .team-red {
+            color: white; /* Text color */
+            padding: 5px 10px; /* Adjust padding as needed */
+            border-radius: 50px; /* Half of the height to create oval shape */
+            display: inline-block; /* Ensures that the background size adjusts to content */
+            margin-right: 5px; /* Add space between elements if needed */
+            font-weight: bold; /* Make the font thicker */
+            background: 
+                /* Background gradient for inner part */
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+                /* Background color for outer part */
+                linear-gradient(to bottom, #F15959, #F15959); /* Red background color */
+            background-size: 100% 100%; /* Set background size */
+            background-repeat: no-repeat; /* Prevent repeating */
+            text-shadow: 0 0 3px rgb(0, 0, 0); 
+            box-shadow: 0 0 1px 1px #000000
+        }
+
+        .team-red-winner {
+            color: white; /* Text color */
+            padding: 5px 10px; /* Adjust padding as needed */
+            border-radius: 50px; /* Half of the height to create oval shape */
+            display: inline-block; /* Ensures that the background size adjusts to content */
+            margin-right: 5px; /* Add space between elements if needed */
+            font-weight: bold; /* Make the font thicker */
+            background: 
+                /* Background gradient for inner part */
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+                /* Background color for outer part */
+                linear-gradient(to bottom, #F15959, #F15959); /* Red background color */
+            background-size: 100% 100%; /* Set background size */
+            background-repeat: no-repeat; /* Prevent repeating */
+            text-shadow: 0 0 3px rgb(0, 0, 0); 
+            box-shadow: 0 0 0 2px gold; 
+        }
+
+        .team-red-faded {
+            color: white; /* Text color */
+            padding: 5px 10px; /* Adjust padding as needed */
+            border-radius: 50px; /* Half of the height to create oval shape */
+            display: inline-block; /* Ensures that the background size adjusts to content */
+            margin-right: 5px; /* Add space between elements if needed */
+            font-weight: bold; /* Make the font thicker */
+            background: 
+                /* Background gradient for inner part */
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+                /* Background color for outer part */
+                linear-gradient(to bottom, #F15959, #F15959); /* Red background color */
+            background-size: 100% 100%; /* Set background size */
+            background-repeat: no-repeat; /* Prevent repeating */
+            text-shadow: 0 0 3px rgb(0, 0, 0); 
+            opacity: 0.5;
+        }
+
+        .team-blu {
+            color: white; /* Text color */
+            padding: 5px 10px; /* Adjust padding as needed */
+            border-radius: 50px; /* Half of the height to create oval shape */
+            display: inline-block; /* Ensures that the background size adjusts to content */
+            margin-right: 5px; /* Add space between elements if needed */
+            font-weight: bold; /* Make the font thicker */
+            background: 
+                /* Background gradient for inner part */
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+                /* Background color for outer part */
+                linear-gradient(to bottom, #6565FE, #6565FE); /* Blue background color */
+            background-size: 100% 100%; /* Set background size */
+            background-repeat: no-repeat; /* Prevent repeating */
+            text-shadow: 0 0 3px rgb(0, 0, 0); 
+            box-shadow: 0 0 1px 1px #000000
+        }
+
+        .team-blu-winner {
+            color: white; /* Text color */
+            padding: 5px 10px; /* Adjust padding as needed */
+            border-radius: 50px; /* Half of the height to create oval shape */
+            display: inline-block; /* Ensures that the background size adjusts to content */
+            margin-right: 5px; /* Add space between elements if needed */
+            font-weight: bold; /* Make the font thicker */
+            background: 
+                /* Background gradient for inner part */
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+                /* Background color for outer part */
+                linear-gradient(to bottom, #6565FE, #6565FE); /* Blue background color */
+            background-size: 100% 100%; /* Set background size */
+            background-repeat: no-repeat; /* Prevent repeating */
+            text-shadow: 0 0 3px rgb(0, 0, 0); 
+            box-shadow: 0 0 0 2px gold; 
+        }
+         
+        .team-blu-faded {
+            color: white; /* Text color */
+            padding: 5px 10px; /* Adjust padding as needed */
+            border-radius: 50px; /* Half of the height to create oval shape */
+            display: inline-block; /* Ensures that the background size adjusts to content */
+            margin-right: 5px; /* Add space between elements if needed */
+            font-weight: bold; /* Make the font thicker */
+            background: 
+                /* Background gradient for inner part */
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+                /* Background color for outer part */
+                linear-gradient(to bottom, #6565FE, #6565FE); /* Blue background color */
+            background-size: 100% 100%; /* Set background size */
+            background-repeat: no-repeat; /* Prevent repeating */
+            text-shadow: 0 0 3px rgb(0, 0, 0); 
+            opacity: 0.5;
+        }
+
+        .team-grn {
+            color: rgb(255, 255, 255); /* Text color */
+            padding: 5px 10px; /* Adjust padding as needed */
+            border-radius: 50px; /* Half of the height to create oval shape */
+            display: inline-block; /* Ensures that the background size adjusts to content */
+            margin-right: 5px; /* Add space between elements if needed */
+            font-weight: bold; /* Make the font thicker */
+            background: 
+                /* Background gradient for inner part */
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+                /* Background color for outer part */
+                linear-gradient(to bottom, #4CE44C, #4CE44C); /* Green background color */
+            background-size: 100% 100%; /* Set background size */
+            background-repeat: no-repeat; /* Prevent repeating */
+            text-shadow: 0 0 3px rgb(0, 0, 0); 
+            box-shadow: 0 0 1px 1px #000000
+        }
+
+        .team-grn-winner {
+            color: rgb(255, 255, 255); /* Text color */
+            padding: 5px 10px; /* Adjust padding as needed */
+            border-radius: 50px; /* Half of the height to create oval shape */
+            display: inline-block; /* Ensures that the background size adjusts to content */
+            margin-right: 5px; /* Add space between elements if needed */
+            font-weight: bold; /* Make the font thicker */
+            background: 
+                /* Background gradient for inner part */
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+                /* Background color for outer part */
+                linear-gradient(to bottom, #4CE44C, #4CE44C); /* Green background color */
+            background-size: 100% 100%; /* Set background size */
+            background-repeat: no-repeat; /* Prevent repeating */
+            text-shadow: 0 0 3px rgb(0, 0, 0); 
+            box-shadow: 0 0 0 2px gold; 
+        }
+
+        .team-grn-faded {
+            color: rgb(255, 255, 255); /* Text color */
+            padding: 5px 10px; /* Adjust padding as needed */
+            border-radius: 50px; /* Half of the height to create oval shape */
+            display: inline-block; /* Ensures that the background size adjusts to content */
+            margin-right: 5px; /* Add space between elements if needed */
+            font-weight: bold; /* Make the font thicker */
+            background: 
+                /* Background gradient for inner part */
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+                /* Background color for outer part */
+                linear-gradient(to bottom, #4CE44C, #4CE44C); /* Green background color */
+            background-size: 100% 100%; /* Set background size */
+            background-repeat: no-repeat; /* Prevent repeating */
+            text-shadow: 0 0 3px rgb(0, 0, 0); 
+            opacity: 0.5;
+        }
+
+        .character-icon {
+            width: 24px;
+            height: auto;
+            margin-top: 5px;
+            margin-left: 1px;
+            margin-right: 0px;
+            transform: translateY(6px);
+        }
+
+        .KO-icon {
+            width: 20px;
+            height: auto;
+            margin-right: 0px;
+        }
+
+        /* border colors in table */
+        .team-RED {
+            border: 1px solid #F15959;
+        }
+
+        .team-BLU {
+            border: 1px solid #6565FE;
+        }
+
+        .team-GRN {
+            border: 1px solid #4CE44C;
+        }
+
+        /* Define styles for alternating row shades */
+        .table-row-even {
+            background-color: rgba(0, 0, 0, 0.35);
+        }
+
+        .table-row-odd {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .gold-text {
+            color: #fdd90c;
+            font-weight: bold;
+        }
+
+        .collapsible {
+            margin-bottom: 20px;
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center; 
+            justify-content: space-between;
+            background-color: #444;
+            color: #eee;
+            padding: 10px;
+            padding-top: 0px;
+            cursor: pointer;
+            line-height: normal;
+            transition: background-color 0.3s ease;
+            border-radius: 8px;
+         }
+
+        .collapsible-header * {
+            pointer-events: none; /* Disable pointer events on child elements */
+        }
+
+        .collapsible-header:hover {
+            background-color: #646464;
+        }
+
+        .collapsible-body {
+            display: block; /* display collapsible body by default */
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .collapsible-body.show {
+            display: none; /* hide collapsible body when active */
+        }
+
+        #footer {
+            text-align: center;
+            margin-top: auto;
+            margin-left: auto;
+            margin-right: auto; 
+            width: fit-content; 
+        }
+
+        #footer a {
+            color: rgba(255, 255, 255, 0.55);
+            text-decoration: none;
+        }
+
+        #footer a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        #expandCollapseButton {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background-color: #dcdcdc;
+            color: #000;
+            border: 1px solid #000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 999;
+        }
+
+        #expandCollapseButton:hover {
+            background-color: #ffffff;
+        }
+
+        #about-link a {
+            color: rgba(255, 255, 255, 0.55);
+            text-decoration: none;
+        }
+
+        #about-link a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Modal container */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top of everything */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scrolling if needed */
+            background-color: rgba(0, 0, 0, 0.8); /* Black background with some transparency */
+        }
+
+        /* Modal content */
+        .modal-content {
+            background-color: #333; /* Dark background */
+            margin: 20% auto; /* Centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* 80% width */
+            max-width: 600px; /* Maximum width */
+            color: #fff; /* Text color */
+        }
+
+        .button-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .button-container button {
+            margin-right: 10px;
+        }
+
+        .button-description {
+            margin-left: 5px;
+            flex-grow: 1;
+        }
+
+        /* Close button */
+        .close {
+            color: #aaa; /* Light gray */
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #fff; /* Change color on hover/focus */
+            text-decoration: none; /* Remove underline */
+            cursor: pointer; /* Add pointer cursor */
+        }
+
+        .small-text {
+            font-size: 0.9em; /* Adjust the font size as needed */
+        }
+
+        /* Customize scrollbar track */
+        ::-webkit-scrollbar {
+            width: 12px; /* Set the width of the scrollbar */
+            background-color: #222; /* Set the background color of the scrollbar track */
+            border-radius: 5px; /* Set the border radius for rounded edges */
+        }
+
+        /* Customize scrollbar thumb */
+        ::-webkit-scrollbar-thumb {
+            background-color: #555; /* Set the color of the scrollbar thumb */
+            border-radius: 5px; /* Set the border radius for rounded edges */
+        }
+
+        /* Customize scrollbar thumb on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #888; /* Set the color of the scrollbar thumb when hovered */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="loading-container">
+            <div id="loading-text" style="display: none;"></div>
+            <div id="loading-bar">
+                <div id="progress"></div>
+            </div>
+        </div>
+        <div>
+            <button id="startButton">Process Files</button>
+            <button id="refreshButton" onclick="window.location.reload();">Refresh</button>
+            <button id="selectFolderButton">Select Folder</button>
+            <button id="openFolderButton">Open Folder</button>
+        </div>
+    </header>
+    <div style="height: 20px;"></div>
+
+    <main>
+        <div id="collapsibleContainer"></div>
+        <div id="tableContainer"></div>
+    </main>
+
+    <button id="expandCollapseButton">Expand/Collapse All</button>
+    <footer id="footer">
+        <div id="about-link">
+            <a href="#" id="about-link-text">made by buddyboom</a>
+        </div>
+    </footer>
+
+    <div id="about-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>made by <span><a href="https://twitter.com/buddyboom_" target="_blank" style="color: #1DA1F2;" id="twitter-link">buddyboom</a> <img src="images/twitter.png" alt="Twitter icon" style="width: 24px; height: 24px;"></span></h2>
+            <p><img src="images/buddyboom.png" alt="buddyboom profile pic" style="max-width: 200px; max-height: 200px"></p>
+            
+            <div class="button-container">
+                <button class="startButton" id="startButton" onclick="return false;">Process Files</button>
+                <span class="button-description">Computes stats for all files in your chosen folder. Searches subfolders. Does not clear screen of previously processed files.</span>
+            </div>
+    
+            <div class="button-container">
+                <button class="refreshButton" id="refreshButton" style="margin-left: 0;" onclick="return false;">Refresh</button>
+                <span class="button-description">Clears screen of processed files.</span>
+            </div>
+    
+            <div class="button-container">
+                <button class="selectFolderButton" id="selectFolderButton" onclick="return false;">Select Folder</button>
+                <span class="button-description">.slp files placed here will be processed. I recommend choosing a separate folder to paste your .slp files into. Use <span style="color:#4CAF50">Slippi Launcher</span> to reference which files to copy/paste.</span>
+            </div>
+    
+            <div class="button-container">
+                <button class="openFolderButton" id="openFolderButton" onclick="return false;">Open Folder</button>
+                <span class="button-description">Opens your selected folder. Paste your .slp files here.</span>
+            </div>
+
+            <p><span class="team-red">ZAP#151</span> - ordinary player font.</p>
+            <p><span class="team-red-faded">ZAP#151</span> - this player LRAS'd to end the match. 
+                <span style="display: block; margin-left: 20px; font-size: smaller;" >If you LRAS after a disconnect, it'll show up as you.</span>
+            </p>
+
+            <h3><a href="https://github.com/project-slippi/slippi-js/tree/feat/doubles" target="_blank" style="color: #1DA1F2;">slippi-js feat/doubles</a></h3>
+            <p>This app uses a very old (May 23, 2021) version of .slp parsing that is compatible with doubles. Stats may not be 100% accurate.</p>
+            <a target="_blank" href="https://icons8.com/icon/11825qXq70O3/super-smash-bros" style="color: rgba(255, 255, 255, 0.55)">Super Smash Bros</a> 
+                icon by <a target="_blank" href="https://icons8.com" style="color: rgba(255, 255, 255, 0.55)">Icons8</a>
+        </div>
+    </div>
+    
+    
+    
+    <script src="renderer.js"></script>
+</body>
+</html>
