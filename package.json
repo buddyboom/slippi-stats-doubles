@@ -34,7 +34,7 @@
     "name": "buddyboom",
     "email": "buddyboom.co@gmail.com"
   },
-  "license": "ISC",
+  "license": "LGPL-3.0",
   "dependencies": {
     "@slippi/slippi-js": "https://github.com/project-slippi/slippi-js.git#2e1320a",
     "browserify": "^17.0.0",
