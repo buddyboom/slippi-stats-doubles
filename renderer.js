@@ -338,7 +338,7 @@ function addPlayerData(table, label, data, settings) {
 
         // Apply gold to the cell with the maximum value
         valueCells.forEach(cell => {
-            if (parseInt(cell.textContent) === maxValue) {
+            if (parseFloat(cell.textContent) === maxValue) {
                 cell.classList.add('gold-text');
             }
         });
