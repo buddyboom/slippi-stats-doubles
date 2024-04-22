@@ -3,7 +3,7 @@
   "productName": "Slippi Stats Doubles",
   "version": "1.1.0",
   "description": "Process Slippi doubles files in bulk",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "build": "tsc --noEmit && dts build --target node",

@@ -532,6 +532,21 @@
             <button id="selectFolderButton">Select Folder</button>
             <button id="openFolderButton">Open Folder</button>
         </div>
+        <div id="processingOptionsText">
+            <!-- The processing options will be dynamically added here -->
+        </div>
+        <select id="fileCount">
+            <option value="ALL">ALL</option>
+            <option value="CUSTOM">Custom</option>
+            <!-- Add more options as needed -->
+        </select>
+        <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none;">
+        
+        <select id="fileOrder">
+            <option value="Descending">newest</option>
+            <option value="Ascending">oldest</option>
+        </select>
+        
     </header>
     <div style="height: 20px;"></div>
 
@@ -550,8 +565,8 @@
     <div id="about-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>made by <span><a href="https://twitter.com/buddyboom_" target="_blank" style="color: #1DA1F2;" id="twitter-link">buddyboom</a> <img src="images/twitter.png" alt="Twitter icon" style="width: 24px; height: 24px;"></span></h2>
-            <p><img src="images/buddyboom.png" alt="buddyboom profile pic" style="max-width: 200px; max-height: 200px"></p>
+            <h2>made by <span><a href="https://twitter.com/buddyboom_" target="_blank" style="color: #1DA1F2;" id="twitter-link">buddyboom</a> <img src="../images/twitter.png" alt="Twitter icon" style="width: 24px; height: 24px;"></span></h2>
+            <p><img src="../images/buddyboom.png" alt="buddyboom profile pic" style="max-width: 200px; max-height: 200px"></p>
             
             <div class="button-container">
                 <button class="startButton" id="startButton" onclick="return false;">Process Files</button>
