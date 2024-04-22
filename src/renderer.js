@@ -14,12 +14,12 @@ const TeamColors = {
 };
 
 const getCharacterIconPath = (characterId, color) => {
-    const iconPath = path.join(__dirname, `./images/characters/${characterId}/${color}/stock.png`);
+    const iconPath = path.join(__dirname, `../images/characters/${characterId}/${color}/stock.png`);
     return iconPath;
 };
 
 const getKOIconPath = (teamId) => {
-    const KOpath = path.join(__dirname, `./images/misc/KO-${teamId}.png`);
+    const KOpath = path.join(__dirname, `../images/misc/KO-${teamId}.png`);
     return KOpath;
 };
 
@@ -81,7 +81,7 @@ function calculateGameLength(latestFrame) {
     return `${minutes}m${seconds}s`;
 }
 
-function findFilesInDir(startPath, filter) {
+function findFilesInDir(startPath, filter, fileOrder) {
     var results = [];
 
     if (!existsSync(startPath)){
@@ -89,28 +89,40 @@ function findFilesInDir(startPath, filter) {
         return;
     }
 
-    var files=readdirSync(startPath);
-    for(var i=0;i<files.length;i++){
-        var filename=join(startPath,files[i]);
+    var files = readdirSync(startPath);
+    
+    // Sort files by user selected order
+    if (fileOrder === 'Descending') { // most recent first
+        files.sort((a, b) => {
+            const statA = lstatSync(join(startPath, a));
+            const statB = lstatSync(join(startPath, b));
+            return statB.mtime.getTime() - statA.mtime.getTime();
+        });
+    } else if (fileOrder === 'Ascending') {
+        files.sort((a, b) => {
+            const statA = lstatSync(join(startPath, a));
+            const statB = lstatSync(join(startPath, b));
+            return statA.mtime.getTime() - statB.mtime.getTime();
+        });
+    }
+
+    for(var i = 0; i < files.length; i++){
+        var filename = join(startPath, files[i]);
         var stat = lstatSync(filename);
         
         // find files in subfolders
         if (stat.isDirectory()){
-            results = results.concat(findFilesInDir(filename,filter)); //recurse
+            results = results.concat(findFilesInDir(filename, filter, fileOrder)); //recurse
         }
-        else if (filename.indexOf(filter)>=0) {
+        else if (filename.indexOf(filter) >= 0) {
             console.log('-- found: ',filename);
             results.push(filename);
         }
     }
-
-    // Sort files by modification time in descending order (most recent first)
-    results.sort((a, b) => {
-        return lstatSync(b).mtime.getTime() - lstatSync(a).mtime.getTime();
-    });
     
     return results;
 }
+
 
 function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts) {
     if (metadata && settings) {
@@ -122,13 +134,16 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
 
         let winningTeamColor = null;
 
-        stockCounts.forEach((stocksRemaining, index) => {
-            if (stocksRemaining > 0) {
-                winningTeamColor = TeamColors[settings.players[index].teamId].toLowerCase();
-                // console.log("winningTeamColor found: " + winningTeamColor);
-            }
-        });
+        if(gameEnd != null && gameEnd.gameEndMethod === 3) {
+            stockCounts.forEach((stocksRemaining, index) => {
+                if (stocksRemaining > 0) {
+                    winningTeamColor = TeamColors[settings.players[index].teamId].toLowerCase();
+                    // console.log("winningTeamColor found: " + winningTeamColor);
+                }
+            });
         // console.log("winningTeamColor: " + winningTeamColor);
+        }
+
 
         // Construct header text with date, time, Connect Code, and stage
         const connectCodes = settings.players.map((player, index) => {
@@ -491,7 +506,7 @@ function saveSelectedFolderToLocalStorage(folderPath) {
 
 // Function to retrieve selected folder path from localStorage
 function getSelectedFolderFromLocalStorage() {
-    return localStorage.getItem('selectedFolder');
+    return localStorage.getItem('selectedFolder') || '(Select Folder)';
 }
 
 // Event listener for the open folder button
@@ -533,9 +548,33 @@ async function processFiles() {
         return;
     }
 
+    const fileOrderSelect = document.getElementById('fileOrder');
+    const fileOrder = fileOrderSelect.value;
+
     // Find .slp files in the selected folder
-    const gameFiles = findFilesInDir(selectedFolder, '.slp');
-    const totalFiles = gameFiles.length;
+    let gameFiles = findFilesInDir(selectedFolder, '.slp', fileOrder);
+
+    // Get the value of the file count dropdown
+    const fileCountSelect = document.getElementById('fileCount');
+    const selectedFileCount = fileCountSelect.value;
+
+    // Determine the number of files to process based on the user's selection
+    let totalFiles;
+    if (selectedFileCount === 'ALL') {
+        totalFiles = gameFiles.length;
+    } else if (selectedFileCount === 'CUSTOM') {
+        const customFileCount = parseInt(document.getElementById('customFileCount').value);
+        if (!isNaN(customFileCount)) {
+            totalFiles = Math.min(customFileCount, gameFiles.length);
+        } else {
+            console.log('Invalid custom file count. Please enter a valid number.');
+            alert('Invalid custom file count. Please enter a valid number.');
+            return;
+        }
+    } else {
+        // Assume a specific number is selected
+        totalFiles = parseInt(selectedFileCount);
+    }
 
     // Show loading bar and text
     const loadingText = document.getElementById('loading-text');
@@ -605,7 +644,47 @@ document.getElementById('expandCollapseButton').addEventListener('click', functi
     });
 });
 
+function displayProcessingOptions() {
+    const fileCountSelect = document.getElementById('fileCount');
+    const fileOrderSelect = document.getElementById('fileOrder');
+    const selectedFolder = getSelectedFolderFromLocalStorage();
+    const processingOptionsText = document.getElementById('processingOptionsText');
+
+    // Display selected folder or prompt to select folder if none is selected
+    if (selectedFolder) {
+        processingOptionsText.textContent = `Process (${fileCountSelect.value}) (${fileCountSelect.value === 'ALL' ? 'n/a' : fileOrderSelect.value}) files in the directory (${selectedFolder}).`;
+    } else {
+        processingOptionsText.textContent = 'Select a folder to process files.';
+    }
+
+    // If ALL is selected, force the second selection to be n/a
+    if (fileCountSelect.value === 'ALL') {
+        fileOrderSelect.value = 'n/a';
+    }
+
+    // Enable/disable file order selection based on file count selection
+    // fileOrderSelect.disabled = fileCountSelect.value === 'ALL';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM content loaded");
+    
+    // Display processing options when the page is loaded
+    displayProcessingOptions();
+        
+    const fileCountSelect = document.getElementById('fileCount');
+    const customFileCountInput = document.getElementById('customFileCount');
+
+    fileCountSelect.addEventListener('change', function() {
+        const selectedOption = fileCountSelect.value;
+        if (selectedOption === 'ALL') {
+            customFileCountInput.style.display = 'none';
+            customFileCountInput.value = ''; // Clear the value
+        } else if (selectedOption === 'CUSTOM') {
+            customFileCountInput.style.display = 'inline-block';
+        }
+    });
+
     const aboutModal = document.getElementById('about-modal');
     const closeButton = document.querySelector('.close');
 
