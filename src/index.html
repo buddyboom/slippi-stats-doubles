@@ -535,17 +535,25 @@
         <div id="processingOptionsText">
             <!-- The processing options will be dynamically added here -->
         </div>
-        <select id="fileCount">
-            <option value="ALL">ALL</option>
-            <option value="CUSTOM">Custom</option>
-            <!-- Add more options as needed -->
-        </select>
-        <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none;">
+        <div class="options-container">
+            <div class="option">
+                <label for="fileCount">File Count:</label>
+                <select id="fileCount">
+                    <option value="ALL">ALL</option>
+                    <option value="CUSTOM">Custom</option>
+                    <!-- Add more options as needed -->
+                </select>
+                <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none;">
+            </div>
+            <div class="option">
+                <label for="fileOrder">File Order:</label>
+                <select id="fileOrder">
+                    <option selected value="Descending">Newest</option>
+                    <option value="Ascending">Oldest</option>
+                </select>
+            </div>
+        </div>
         
-        <select id="fileOrder">
-            <option value="Descending">newest</option>
-            <option value="Ascending">oldest</option>
-        </select>
         
     </header>
     <div style="height: 20px;"></div>
