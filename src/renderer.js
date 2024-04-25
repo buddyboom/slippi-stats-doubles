@@ -548,15 +548,16 @@ async function processFiles() {
         return;
     }
 
-    const fileOrderSelect = document.getElementById('fileOrder');
-    const fileOrder = fileOrderSelect.value;
+    // Get the value of the file order radio buttons
+    const fileOrderRadio = document.querySelector('input[name="fileOrder"]:checked');
+    const fileOrder = fileOrderRadio ? fileOrderRadio.value : 'Descending';
 
     // Find .slp files in the selected folder
     let gameFiles = findFilesInDir(selectedFolder, '.slp', fileOrder);
 
-    // Get the value of the file count dropdown
-    const fileCountSelect = document.getElementById('fileCount');
-    const selectedFileCount = fileCountSelect.value;
+    // Get the value of the file count radio buttons
+    const fileCountRadio = document.querySelector('input[name="fileCount"]:checked');
+    const selectedFileCount = fileCountRadio ? fileCountRadio.value : 'ALL';
 
     // Determine the number of files to process based on the user's selection
     let totalFiles;
@@ -645,8 +646,8 @@ document.getElementById('expandCollapseButton').addEventListener('click', functi
 });
 
 function displayProcessingOptions() {
-    const fileCountSelect = document.getElementById('fileCount');
-    const fileOrderSelect = document.getElementById('fileOrder');
+    const fileCountSelect = document.querySelector('input[name="fileCount"]:checked');
+    const fileOrderSelect = document.querySelector('input[name="fileOrder"]:checked');
     const selectedFolder = getSelectedFolderFromLocalStorage();
     const processingOptionsText = document.getElementById('processingOptionsText');
 
@@ -656,33 +657,32 @@ function displayProcessingOptions() {
     } else {
         processingOptionsText.textContent = 'Select a folder to process files.';
     }
-
-    // If ALL is selected, force the second selection to be n/a
-    if (fileCountSelect.value === 'ALL') {
-        fileOrderSelect.value = 'n/a';
-    }
-
-    // Enable/disable file order selection based on file count selection
-    // fileOrderSelect.disabled = fileCountSelect.value === 'ALL';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM content loaded");
-    
+
     // Display processing options when the page is loaded
     displayProcessingOptions();
-        
-    const fileCountSelect = document.getElementById('fileCount');
-    const customFileCountInput = document.getElementById('customFileCount');
 
-    fileCountSelect.addEventListener('change', function() {
-        const selectedOption = fileCountSelect.value;
-        if (selectedOption === 'ALL') {
-            customFileCountInput.style.display = 'none';
-            customFileCountInput.value = ''; // Clear the value
-        } else if (selectedOption === 'CUSTOM') {
-            customFileCountInput.style.display = 'inline-block';
-        }
+    const allFilesRadio = document.getElementById('allFiles');
+    const customFilesRadio = document.getElementById('customFiles');
+    const customFileCountInput = document.getElementById('customFileCount');
+    const fileCountSelect = document.querySelector('input[name="fileCount"]:checked');
+    const fileOrderSelect = document.querySelector('input[name="fileOrder"]:checked');
+
+    // Event listener for radio button change
+    allFilesRadio.addEventListener('change', function() {
+        console.log("ALL radio button clicked");
+        customFileCountInput.style.display = 'none';
+        customFileCountInput.value = ''; // Clear the value
+        displayProcessingOptions(); // Update processing options
+    });
+
+    customFilesRadio.addEventListener('change', function() {
+        console.log("Custom radio button clicked");
+        customFileCountInput.style.display = customFilesRadio.checked ? 'inline-block' : 'none';
+        displayProcessingOptions(); // Update processing options
     });
 
     const aboutModal = document.getElementById('about-modal');

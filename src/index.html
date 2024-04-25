@@ -363,7 +363,7 @@
         }
 
         .collapsible {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .collapsible-header {
@@ -535,13 +535,12 @@
         <div id="processingOptionsText">
             <!-- The processing options will be dynamically added here -->
         </div>
-        <div class="options-container">
+        <!-- <div class="options-container">
             <div class="option">
                 <label for="fileCount">File Count:</label>
                 <select id="fileCount">
                     <option value="ALL">ALL</option>
                     <option value="CUSTOM">Custom</option>
-                    <!-- Add more options as needed -->
                 </select>
                 <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none;">
             </div>
@@ -551,6 +550,28 @@
                     <option selected value="Descending">Newest</option>
                     <option value="Ascending">Oldest</option>
                 </select>
+            </div>
+        </div> -->
+
+        <div class="options-container">
+            <div class="option">
+                <label>File Count:</label>
+                <div class="radio-group">
+                    <input type="radio" id="allFiles" name="fileCount" value="ALL" checked>
+                    <label for="allFiles">ALL</label>
+                    <input type="radio" id="customFiles" name="fileCount" value="CUSTOM">
+                    <label for="customFiles">Custom</label>
+                </div>
+                <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none;">
+            </div>
+            <div class="option">
+                <label>File Order:</label>
+                <div class="radio-group">
+                    <input type="radio" id="descending" name="fileOrder" value="Descending" checked>
+                    <label for="descending">Newest</label>
+                    <input type="radio" id="ascending" name="fileOrder" value="Ascending">
+                    <label for="ascending">Oldest</label>
+                </div>
             </div>
         </div>
         
