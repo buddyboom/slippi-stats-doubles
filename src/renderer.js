@@ -595,6 +595,9 @@ async function processFiles() {
             }, 0); // Execute in the next event loop iteration
         });
     }
+
+    // Hide loading text and bar when done
+    loadingText.style.display = 'none';
 }
 
 // Event listener for the start button
