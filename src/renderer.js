@@ -24,7 +24,6 @@ const getKOIconPath = (teamId) => {
 };
 
 function convertUTCtoLocalTime(utcString, timezone) {
-    // Create a Date object from the UTC string
     const utcDate = new Date(utcString);
   
     // Get the UTC offset for the specified timezone
@@ -34,7 +33,7 @@ function convertUTCtoLocalTime(utcString, timezone) {
     const localDate = new Date(utcDate.getTime() + (timezoneOffset * 60 * 60 * 1000));
 
     // auto formatting had a comma
-       // Format the local date as desired (e.g., "YYYY-MM-DD hh:mm:ss")
+    // Format the local date as desired (e.g., "YYYY-MM-DD hh:mm:ss")
     //    const formattedDate = localDate.toLocaleString('en-US', {
     //     timeZone: 'America/Chicago', // Timezone for Central Time (CT)
     //     year: 'numeric',
@@ -123,7 +122,6 @@ function findFilesInDir(startPath, filter, fileOrder) {
     return results;
 }
 
-
 function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts) {
     if (metadata && settings) {
         const collapsibleDiv = document.createElement('div');
@@ -143,7 +141,6 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
             });
         // console.log("winningTeamColor: " + winningTeamColor);
         }
-
 
         // Construct header text with date, time, Connect Code, and stage
         const connectCodes = settings.players.map((player, index) => {
@@ -236,12 +233,10 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
     }
 }
 
-
 function isLRASInitiator(gameEnd, playerIndex) {
     return parseInt(gameEnd.lrasInitiatorIndex) === playerIndex;
 }
 
-// Function to append collapsible section to the container
 function appendCollapsibleSection(section) {
     const container = document.getElementById('collapsibleContainer');
     container.appendChild(section);
@@ -324,10 +319,10 @@ function computeStats(gameFile) {
         appendTable(table);
 
         console.log(fileName + " " + stages.getStageName(settings.stageId));
-        if(gameEnd != null) {
-            // console.log('LRAS: '+ (parseInt(gameEnd.lrasInitiatorIndex)+ 1))
-            // console.log("gameEnd.gameEndMethod: "+gameEnd.gameEndMethod);    
-        }
+        // if(gameEnd != null) {
+        //     console.log('LRAS: '+ (parseInt(gameEnd.lrasInitiatorIndex)+ 1))
+        //     console.log("gameEnd.gameEndMethod: "+gameEnd.gameEndMethod);    
+        // }
         console.log("---");
     
         // Append the table to the collapsible body
