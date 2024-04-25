@@ -12,11 +12,11 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            min-height: 90vh; /* Ensure the body takes up at least the full viewport height */
+            min-height: 90vh;
         }
 
         #startButton {
-            background-color: #4CAF50; /* Green color */
+            background-color: #4CAF50;
             border: none;
             color: white;
             text-align: center;
@@ -47,23 +47,21 @@
         }
 
         #startButton, #refreshButton {
-            float: left; /* Float left */
+            float: left;
         }
 
         #selectFolderButton {
-            /* Apply common button styles */
             background-color: #555;
             color: #eee;
             border: none;
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 10px;
-            transition: background-color 0.3s ease; /* Add transition effect */
-            float: right; /* Float right */
+            transition: background-color 0.3s ease;
+            float: right;
         }
 
         #selectFolderButton:hover {
-            /* Add hover effect */
             background-color: #666;
         }
 
@@ -74,7 +72,7 @@
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 10px;
-            transition: background-color 0.3s ease; /* Add transition effect */
+            transition: background-color 0.3s ease;
             float: right;
             margin-right: 5px;
         }
@@ -83,7 +81,6 @@
             background-color: #666;
         }
 
-        /* Loading bar styles */
         #loading-container {
             width: 100%;
             margin-top: 20px;
@@ -97,7 +94,7 @@
         }
 
         #loading-bar {
-            width: 80%; /* Adjust the width as needed */
+            width: 80%;
             height: 20px;
             background-color: #f0f0f0;
             border-radius: 10px;
@@ -109,7 +106,7 @@
             height: 100%;
             background-color: #4CAF50;
             border-radius: 10px;
-            transition: width 0.3s ease-in-out; /* Adjust the animation speed as needed */
+            transition: width 0.3s ease-in-out;
         }
 
         #tableContainer {
@@ -381,7 +378,7 @@
          }
 
         .collapsible-header * {
-            pointer-events: none; /* Disable pointer events on child elements */
+            pointer-events: none; /* Disable pointer events on child elements, makes whole header clickable */
         }
 
         .collapsible-header:hover {
@@ -448,21 +445,21 @@
             z-index: 1000; /* Sit on top of everything */
             left: 0;
             top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scrolling if needed */
+            width: 100%;
+            height: 100%;
+            overflow: auto;
             background-color: rgba(0, 0, 0, 0.8); /* Black background with some transparency */
         }
 
         /* Modal content */
         .modal-content {
-            background-color: #333; /* Dark background */
+            background-color: #333;
             margin: 20% auto; /* Centered */
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; /* 80% width */
-            max-width: 600px; /* Maximum width */
-            color: #fff; /* Text color */
+            width: 80%;
+            max-width: 600px;
+            color: #fff;
         }
 
         .button-container {
@@ -482,7 +479,7 @@
 
         /* Close button */
         .close {
-            color: #aaa; /* Light gray */
+            color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
@@ -490,31 +487,31 @@
 
         .close:hover,
         .close:focus {
-            color: #fff; /* Change color on hover/focus */
+            color: #fff;
             text-decoration: none; /* Remove underline */
-            cursor: pointer; /* Add pointer cursor */
+            cursor: pointer;
         }
 
         .small-text {
-            font-size: 0.9em; /* Adjust the font size as needed */
+            font-size: 0.9em;
         }
 
-        /* Customize scrollbar track */
+        /* scrollbar track */
         ::-webkit-scrollbar {
-            width: 12px; /* Set the width of the scrollbar */
-            background-color: #222; /* Set the background color of the scrollbar track */
-            border-radius: 5px; /* Set the border radius for rounded edges */
+            width: 12px;
+            background-color: #222;
+            border-radius: 5px;
         }
 
-        /* Customize scrollbar thumb */
+        /* scrollbar thumb */
         ::-webkit-scrollbar-thumb {
-            background-color: #555; /* Set the color of the scrollbar thumb */
-            border-radius: 5px; /* Set the border radius for rounded edges */
+            background-color: #555;
+            border-radius: 5px;
         }
 
-        /* Customize scrollbar thumb on hover */
+        /* scrollbar thumb on hover */
         ::-webkit-scrollbar-thumb:hover {
-            background-color: #888; /* Set the color of the scrollbar thumb when hovered */
+            background-color: #888;
         }
     </style>
 </head>

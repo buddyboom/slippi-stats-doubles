@@ -3,7 +3,6 @@ const { existsSync, readdirSync, lstatSync } = require('fs');
 const { join } = require('path');
 const { SlippiGame } = require('@slippi/slippi-js');
 const { characters, stages } = require('@slippi/slippi-js');
-// const characterIcons = require.context("images/characters")
 const { dialog } = require('electron');
 const path = require('path')
 
@@ -90,7 +89,6 @@ function findFilesInDir(startPath, filter, fileOrder) {
 
     var files = readdirSync(startPath);
     
-    // Sort files by user selected order
     if (fileOrder === 'Descending') { // most recent first
         files.sort((a, b) => {
             const statA = lstatSync(join(startPath, a));
@@ -196,15 +194,15 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         // Create elements for timestamp, stage, and gamelength
         const timestampSpan = document.createElement('span');
         timestampSpan.textContent = timestamp;
-        timestampSpan.classList.add('small-text'); // Add CSS class for smaller font size
+        timestampSpan.classList.add('small-text');
 
         const stageSpan = document.createElement('span');
         stageSpan.textContent = stage;
-        stageSpan.classList.add('small-text'); // Add CSS class for smaller font size
+        stageSpan.classList.add('small-text');
 
         const gamelengthSpan = document.createElement('span');
         gamelengthSpan.textContent = gamelength;
-        gamelengthSpan.classList.add('small-text'); // Add CSS class for smaller font size
+        gamelengthSpan.classList.add('small-text');
 
         // Concatenate all elements into the header text
         const headerText = document.createElement('div');
@@ -355,7 +353,7 @@ function addPlayerData(table, label, data, settings) {
     } else {
         const valueCell = row.insertCell();
         valueCell.textContent = data;
-        valueCell.colSpan = table.rows[0].cells.length - 1; // Span the entire table width
+        valueCell.colSpan = table.rows[0].cells.length - 1; // Span the entire table width for non-array data (deprecated)
     }
 
     labelCell.textContent = label;
@@ -597,9 +595,6 @@ async function processFiles() {
             }, 0); // Execute in the next event loop iteration
         });
     }
-
-    // Hide loading text and bar when done
-    loadingText.style.display = 'none';
 }
 
 // Event listener for the start button
