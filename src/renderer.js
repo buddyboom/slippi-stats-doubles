@@ -646,7 +646,7 @@ function displayProcessingOptions() {
 
     // Display selected folder or prompt to select folder if none is selected
     if (selectedFolder) {
-        processingOptionsText.textContent = `Process (${fileCountSelect.value}) (${fileCountSelect.value === 'ALL' ? 'n/a' : fileOrderSelect.value}) files in the directory (${selectedFolder}).`;
+        processingOptionsText.textContent = `Process ${fileCountSelect.value} ${fileCountSelect.value === 'ALL' ? '' : fileOrderSelect.value} files in the directory (${selectedFolder}).`;
     } else {
         processingOptionsText.textContent = 'Select a folder to process files.';
     }

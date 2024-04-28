@@ -513,6 +513,84 @@
         ::-webkit-scrollbar-thumb:hover {
             background-color: #888;
         }
+        
+        .options-container {
+            display: flex;
+            align-items: center;
+        }
+
+        fieldset {
+            border: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        fieldset:not(:last-child) {
+            padding-bottom: 18px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            /* margin-right: 20px; */
+        }
+
+        legend {
+            /* padding-bottom: 8px; */
+            text-transform: uppercase;
+        }
+
+        .radio-block {
+            position: relative;
+            display: flex;
+            min-width: 200px;
+            /* border: dashed black 1px; */
+            border-radius: 20px;
+            background-color: #000000;
+            margin-top: 10px;
+        }
+
+        .selected {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: calc(50% - 1px);
+            height: calc(100% - 2px);
+            border-radius: 20px;
+            transition: transform 0.2s;
+            background-color: green;
+        }
+
+        label {
+            position: relative;
+            z-index: 100;
+            width: 50%;
+            padding: 10px;
+            transition: color 0.2s;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        input[type=radio]:checked + label {
+            color: #FFF;
+        }
+
+        input[type=radio]:checked + .off-label + .selected {
+        transform: translateX(100%);
+        }
+
+        .sr-only, input[type=radio] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(1px, 1px, 1px, 1px);
+            border: 0;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -534,27 +612,38 @@
             <!-- The processing options will be dynamically added here -->
         </div>
 
+        <h3>Process stats for</h3>
         <div class="options-container">
             <div class="option">
-                <label>File Count:</label>
-                <div class="radio-group">
-                    <input type="radio" id="allFiles" name="fileCount" value="ALL" checked>
-                    <label for="allFiles">ALL</label>
-                    <input type="radio" id="customFiles" name="fileCount" value="CUSTOM">
-                    <label for="customFiles">Custom</label>
-                </div>
-                <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none;">
+                <!-- <label>Process stats for</label> -->
+                <fieldset>
+                    <!-- <legend>File Count:</legend> -->
+                    <div class="radio-block">
+                        <input type="radio" id="allFiles" name="fileCount" value="ALL" checked>
+                        <label for="allFiles">ALL</label>
+                        <input type="radio" id="customFiles" name="fileCount" value="CUSTOM">
+                        <label for="customFiles" class="off-label">Custom</label>
+                        <span class="selected" aria-hidden="true"></span>
+                    </div>
+                    <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none;">
+                </fieldset>
+                <label>files in</label>
             </div>
             <div class="option">
-                <label>File Order:</label>
-                <div class="radio-group">
-                    <input type="radio" id="descending" name="fileOrder" value="Descending" checked>
-                    <label for="descending">Newest</label>
-                    <input type="radio" id="ascending" name="fileOrder" value="Ascending">
-                    <label for="ascending">Oldest</label>
-                </div>
+                <fieldset>
+                    <!-- <legend>File Order:</legend> -->
+                    <div class="radio-block">
+                        <input type="radio" id="descending" name="fileOrder" value="Descending" checked>
+                        <label for="descending">Newest</label>
+                        <input type="radio" id="ascending" name="fileOrder" value="Ascending">
+                        <label for="ascending" class="off-label">Oldest</label>
+                        <span class="selected" aria-hidden="true"></span>
+                    </div>
+                </fieldset>
+                <label>order in the directory</label>
             </div>
         </div>
+        
     </header>
     <div style="height: 20px;"></div>
 
