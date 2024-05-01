@@ -367,7 +367,7 @@
             display: flex;
             align-items: center; 
             justify-content: space-between;
-            background-color: #444;
+            /* background-color: #444; */
             color: #eee;
             padding: 10px;
             padding-top: 0px;
@@ -381,8 +381,20 @@
             pointer-events: none; /* Disable pointer events on child elements, makes whole header clickable */
         }
 
-        .collapsible-header:hover {
-            background-color: #646464;
+        .stage-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure the image covers the entire space */
+            opacity: 0.25;
+            transition: opacity 0.3s ease;
+            z-index: -999; /* sit behind other header elements */
+        }
+
+        .collapsible-header:hover .stage-image {
+            opacity: 0.4;
         }
 
         .collapsible-body {
@@ -494,6 +506,11 @@
 
         .small-text {
             font-size: 0.9em;
+            text-shadow: 
+                -1px -1px 0 #000,  
+                 1px -1px 0 #000,
+                -1px  1px 0 #000,
+                 1px  1px 0 #000;
         }
 
         /* scrollbar track */
@@ -591,6 +608,41 @@
             clip-path: inset(50%);
             white-space: nowrap;
         }
+
+        .custom-file-count {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            width: 50px; /* Adjust width as needed */
+            padding: 5px;
+            border: none;
+            border-bottom: 1px solid grey; /* Grey underline */
+            background: transparent; /* Transparent background */
+            margin: 0 10px; /* Adjust margin as needed */
+        }
+
+        button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        #customFileCount {
+            border: none; /* Remove default border */
+            background-color: transparent; /* Set background to transparent */
+            border-bottom: 1px solid #888; /* Add grey underline */
+            outline: none; /* Remove focus outline */
+            padding: 5px; /* Add padding for better spacing */
+            color: #ffffff; /* Set text color */
+        }
+
+        /* Style placeholder text */
+        #customFileCount::placeholder {
+            color: #949494; /* Set placeholder text color */
+        }
     </style>
 </head>
 <body>
@@ -615,9 +667,7 @@
         <h3>Process stats for</h3>
         <div class="options-container">
             <div class="option">
-                <!-- <label>Process stats for</label> -->
                 <fieldset>
-                    <!-- <legend>File Count:</legend> -->
                     <div class="radio-block">
                         <input type="radio" id="allFiles" name="fileCount" value="ALL" checked>
                         <label for="allFiles">ALL</label>
@@ -625,13 +675,16 @@
                         <label for="customFiles" class="off-label">Custom</label>
                         <span class="selected" aria-hidden="true"></span>
                     </div>
-                    <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none;">
+                    <div class="custom-file-count">
+                        <button class="decrement-btn">-</button>
+                        <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none">
+                        <button class="increment-btn">+</button>
+                    </div>
                 </fieldset>
                 <label>files in</label>
             </div>
             <div class="option">
                 <fieldset>
-                    <!-- <legend>File Order:</legend> -->
                     <div class="radio-block">
                         <input type="radio" id="descending" name="fileOrder" value="Descending" checked>
                         <label for="descending">Newest</label>

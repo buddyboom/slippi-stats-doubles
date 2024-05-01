@@ -22,6 +22,13 @@ const getKOIconPath = (teamId) => {
     return KOpath;
 };
 
+const getStagePath = (stageId) => {
+    console.log('stageId: ' + stageId)
+    const stagePng = path.join(__dirname, `../images/stages/${stageId}.png`);
+    console.log('stagePng: '+stagePng);
+    return stagePng;
+};
+
 function convertUTCtoLocalTime(utcString, timezone) {
     const utcDate = new Date(utcString);
   
@@ -127,6 +134,19 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
 
         const headerDiv = document.createElement('div');
         headerDiv.classList.add('collapsible-header');
+
+        const stageId = settings.stageId;
+        const stagePath = getStagePath(stageId);
+        
+        const stageImage = document.createElement('img');
+        stageImage.src = stagePath;
+        stageImage.classList.add('stage-image');
+        
+        // Apply styles to the header div
+        headerDiv.style.overflow = 'hidden'; // Hide any overflow content
+        headerDiv.style.position = 'relative'; // Set position to relative to contain absolute-positioned elements
+        
+        headerDiv.appendChild(stageImage);
 
         let winningTeamColor = null;
 
@@ -663,19 +683,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const customFileCountInput = document.getElementById('customFileCount');
     const fileCountSelect = document.querySelector('input[name="fileCount"]:checked');
     const fileOrderSelect = document.querySelector('input[name="fileOrder"]:checked');
+    const decrementBtn = document.querySelector('.decrement-btn');
+    const incrementBtn = document.querySelector('.increment-btn');
+    
+    decrementBtn.style.display = 'none';
+    incrementBtn.style.display = 'none';
 
     // Event listener for radio button change
     allFilesRadio.addEventListener('change', function() {
         console.log("ALL radio button clicked");
         customFileCountInput.style.display = 'none';
         customFileCountInput.value = ''; // Clear the value
+        decrementBtn.style.display = 'none';
+        incrementBtn.style.display = 'none';
         displayProcessingOptions(); // Update processing options
     });
-
+    
     customFilesRadio.addEventListener('change', function() {
-        console.log("Custom radio button clicked");
-        customFileCountInput.style.display = customFilesRadio.checked ? 'inline-block' : 'none';
-        displayProcessingOptions(); // Update processing options
+        customFileCountInput.style.display = 'inline-block';
+        customFileCountInput.focus();
+        decrementBtn.style.display = 'inline-block';
+        incrementBtn.style.display = 'inline-block';
+    });
+
+    decrementBtn.addEventListener('click', function() {
+        if (customFileCountInput.value > 0) {
+            customFileCountInput.value--;
+        }
+    });
+
+    incrementBtn.addEventListener('click', function() {
+        customFileCountInput.value++;
     });
 
     const aboutModal = document.getElementById('about-modal');
