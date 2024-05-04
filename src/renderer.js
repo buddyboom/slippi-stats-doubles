@@ -425,13 +425,17 @@ function addPlayerData(table, label, data, settings) {
         });
     } else if (label === 'KOs') {
         const KOCounts = data;
-    
         KOCounts.forEach((count, index) => {
             const teamId = settings.players[index].teamId
-
+    
             // Clear the contents of the cell before appending the icons
             valueCells[index].textContent = '';
-
+        
+            // Create a span element to hold the text content
+            // const countSpan = document.createElement('span');
+            // countSpan.textContent = '×' + count;
+            // countSpan.style.transform = 'translateX(20px)';
+            
             for (let i = 0; i < count; i++) {
                 const KOIcon = document.createElement('img');
                 const iconPath = getKOIconPath(teamId);
@@ -442,7 +446,10 @@ function addPlayerData(table, label, data, settings) {
                 KOIcon.style.marginBottom = '0';
                 valueCells[index].appendChild(KOIcon); // Append each KO icon to the value cell
             }
-        });
+    
+            // Append the count span after appending all the KO icons
+            // valueCells[index].appendChild(countSpan);
+    });
     } else if (label === 'Stocks Remaining' && settings && settings.players) {
         const stocksRemaining = data;
 
@@ -472,7 +479,7 @@ function addPlayerData(table, label, data, settings) {
                     stockIcon.classList.add('character-icon'); 
                     stockIcon.style.transform = 'translateY(2px)';
                     stockIcon.style.marginTop = '0px';
-                    stockIcon.style.opacity = '0.5'; // Apply opacity to stock icon if stocks are 0
+                    stockIcon.style.opacity = '0.3'; // Apply opacity to stock icon if stocks are 0
                     valueCells[index].appendChild(stockIcon); // Append the stock icon to the value cell
                 }
             }
@@ -685,9 +692,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileOrderSelect = document.querySelector('input[name="fileOrder"]:checked');
     const decrementBtn = document.querySelector('.decrement-btn');
     const incrementBtn = document.querySelector('.increment-btn');
-    
-    decrementBtn.style.display = 'none';
-    incrementBtn.style.display = 'none';
 
     // Event listener for radio button change
     allFilesRadio.addEventListener('change', function() {

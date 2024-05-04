@@ -188,7 +188,7 @@
             background-size: 100% 100%; /* Set background size */
             background-repeat: no-repeat; /* Prevent repeating */
             text-shadow: 0 0 3px rgb(0, 0, 0); 
-            box-shadow: 0 0 0 2px gold; 
+            box-shadow: 0 0 0 3px gold; 
         }
 
         .team-red-faded {
@@ -242,7 +242,7 @@
             background-size: 100% 100%; /* Set background size */
             background-repeat: no-repeat; /* Prevent repeating */
             text-shadow: 0 0 3px rgb(0, 0, 0); 
-            box-shadow: 0 0 0 2px gold; 
+            box-shadow: 0 0 0 3px gold; 
         }
          
         .team-blu-faded {
@@ -296,7 +296,7 @@
             background-size: 100% 100%; /* Set background size */
             background-repeat: no-repeat; /* Prevent repeating */
             text-shadow: 0 0 3px rgb(0, 0, 0); 
-            box-shadow: 0 0 0 2px gold; 
+            box-shadow: 0 0 0 3px gold; 
         }
 
         .team-grn-faded {
@@ -546,15 +546,20 @@
             padding-bottom: 18px;
         }
 
-        .option {
+        .option-count {
+            margin-right: 20px;
+        }
+
+        .option-order {
             display: flex;
             align-items: center;
             /* margin-right: 20px; */
         }
 
         legend {
-            /* padding-bottom: 8px; */
-            text-transform: uppercase;
+            padding-top: 8px;
+            /* text-transform: uppercase; */
+            text-align: center;
         }
 
         .radio-block {
@@ -637,11 +642,19 @@
             outline: none; /* Remove focus outline */
             padding: 5px; /* Add padding for better spacing */
             color: #ffffff; /* Set text color */
+            text-align: center;
         }
 
         /* Style placeholder text */
         #customFileCount::placeholder {
             color: #949494; /* Set placeholder text color */
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            appearance: none;
+            -webkit-appearance: none;
+            margin: 0; /* Optional: You might need to adjust the margin */
         }
     </style>
 </head>
@@ -664,10 +677,10 @@
             <!-- The processing options will be dynamically added here -->
         </div>
 
-        <h3>Process stats for</h3>
         <div class="options-container">
-            <div class="option">
+            <div class="option-count">
                 <fieldset>
+                    <legend>File Count</legend>
                     <div class="radio-block">
                         <input type="radio" id="allFiles" name="fileCount" value="ALL" checked>
                         <label for="allFiles">ALL</label>
@@ -676,15 +689,15 @@
                         <span class="selected" aria-hidden="true"></span>
                     </div>
                     <div class="custom-file-count">
-                        <button class="decrement-btn">-</button>
-                        <input type="number" id="customFileCount" placeholder="Enter a number" style="display: none">
-                        <button class="increment-btn">+</button>
+                        <button class="decrement-btn" style="display: none">-</button>
+                        <input type="number" id="customFileCount" style="display: none">
+                        <button class="increment-btn" style="display: none">+</button>
                     </div>
                 </fieldset>
-                <label>files in</label>
             </div>
-            <div class="option">
+            <div class="option-order">
                 <fieldset>
+                    <legend>File Order</legend>
                     <div class="radio-block">
                         <input type="radio" id="descending" name="fileOrder" value="Descending" checked>
                         <label for="descending">Newest</label>
@@ -693,7 +706,6 @@
                         <span class="selected" aria-hidden="true"></span>
                     </div>
                 </fieldset>
-                <label>order in the directory</label>
             </div>
         </div>
         
