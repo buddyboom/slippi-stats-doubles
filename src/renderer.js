@@ -557,6 +557,32 @@ ipcRenderer.on('selected-directory', (event, folderPath) => {
     saveSelectedFolderToLocalStorage(folderPath);
 });
 
+const ProcessedFilesModule = (() => {
+    // Initialize an empty set to store processed file names
+    const processedFiles = new Set();
+
+    // Function to add a file to the set of processed files
+    const addProcessedFile = (fileName) => {
+        processedFiles.add(fileName);
+    };
+
+    // Function to check if a file has been processed
+    const hasProcessedFile = (fileName) => {
+        return processedFiles.has(fileName);
+    };
+
+    const processedFilesSize = () => {
+        return processedFiles.size;
+    }
+
+    // Return the public interface of the module
+    return {
+        addProcessedFile,
+        hasProcessedFile,
+        processedFilesSize
+    };
+})();
+
 // Function to handle processing files
 async function processFiles() {
     // Check if a folder is selected
@@ -582,7 +608,9 @@ async function processFiles() {
     // Determine the number of files to process based on the user's selection
     let totalFiles;
     if (selectedFileCount === 'ALL') {
-        totalFiles = gameFiles.length;
+        totalFiles = gameFiles.length - ProcessedFilesModule.processedFilesSize();
+        console.log(ProcessedFilesModule.processedFilesSize())
+        console.log(totalFiles);
     } else if (selectedFileCount === 'CUSTOM') {
         const customFileCount = parseInt(document.getElementById('customFileCount').value);
         if (!isNaN(customFileCount)) {
@@ -602,18 +630,26 @@ async function processFiles() {
     const loadingBar = document.getElementById('progress');
     loadingText.style.display = 'block';
     loadingBar.style.width = '0';
-
+    
+    let processedCount = 0;
     // Process files asynchronously
-    for (let i = 0; i < totalFiles; i++) {
+    for (let i = 0; i < gameFiles.length && processedCount < totalFiles; i++) {
         const gameFile = gameFiles[i];
-
+        const fileName = gameFile.split('\\').pop(); // Get the file name
+    
+        // Check if the file has already been processed
+        if (ProcessedFilesModule.hasProcessedFile(fileName)) {
+            console.log(`File '${fileName}' has already been processed.`);
+            continue; // Skip processing
+        }
+    
         // Calculate progress and update the loading bar
-        const progress = ((i + 1) / totalFiles) * 100;
+        const progress = ((processedCount + 1) / totalFiles) * 100;
         loadingBar.style.width = `${progress}%`;
-
+    
         // Update loading text
-        loadingText.textContent = `${i}/${totalFiles}`;
-
+        loadingText.textContent = `${processedCount}/${totalFiles}`;
+    
         // Compute stats asynchronously
         await new Promise(resolve => {
             setTimeout(() => {
@@ -621,8 +657,24 @@ async function processFiles() {
                 resolve();
             }, 0); // Execute in the next event loop iteration
         });
-    }
+    
+        // Add the processed file to the set of processed files
+        ProcessedFilesModule.addProcessedFile(fileName);
+        console.log(`File '${fileName}' processed successfully.`);
 
+        processedCount++;
+    }
+    const message = document.createElement('div');
+    message.classList.add('message');
+    message.textContent = 'Processing completed.';
+    document.body.appendChild(message);
+
+    // Remove the message after 3 seconds (adjust the delay as needed)
+    setTimeout(() => {
+        document.body.removeChild(message);
+    }, 5000);
+
+    loadingBar.style.width = '100%';
     // Hide loading text and bar when done
     loadingText.style.display = 'none';
 }
@@ -666,24 +718,24 @@ document.getElementById('expandCollapseButton').addEventListener('click', functi
 });
 
 function displayProcessingOptions() {
-    const fileCountSelect = document.querySelector('input[name="fileCount"]:checked');
-    const fileOrderSelect = document.querySelector('input[name="fileOrder"]:checked');
-    const selectedFolder = getSelectedFolderFromLocalStorage();
-    const processingOptionsText = document.getElementById('processingOptionsText');
+    // const fileCountSelect = document.querySelector('input[name="fileCount"]:checked');
+    // const fileOrderSelect = document.querySelector('input[name="fileOrder"]:checked');
+    // const selectedFolder = getSelectedFolderFromLocalStorage();
+    // const processingOptionsText = document.getElementById('processingOptionsText');
 
-    // Display selected folder or prompt to select folder if none is selected
-    if (selectedFolder) {
-        processingOptionsText.textContent = `Process ${fileCountSelect.value} ${fileCountSelect.value === 'ALL' ? '' : fileOrderSelect.value} files in the directory (${selectedFolder}).`;
-    } else {
-        processingOptionsText.textContent = 'Select a folder to process files.';
-    }
+    // // Display selected folder or prompt to select folder if none is selected
+    // if (selectedFolder) {
+    //     processingOptionsText.textContent = `Process ${fileCountSelect.value} ${fileCountSelect.value === 'ALL' ? '' : fileOrderSelect.value} files in the directory (${selectedFolder}).`;
+    // } else {
+    //     processingOptionsText.textContent = 'Select a folder to process files.';
+    // }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM content loaded");
 
     // Display processing options when the page is loaded
-    displayProcessingOptions();
+    // displayProcessingOptions();
 
     const allFilesRadio = document.getElementById('allFiles');
     const customFilesRadio = document.getElementById('customFiles');
@@ -700,7 +752,7 @@ document.addEventListener('DOMContentLoaded', function() {
         customFileCountInput.value = ''; // Clear the value
         decrementBtn.style.display = 'none';
         incrementBtn.style.display = 'none';
-        displayProcessingOptions(); // Update processing options
+        // displayProcessingOptions(); // Update processing options
     });
     
     customFilesRadio.addEventListener('change', function() {

@@ -25,7 +25,11 @@
             cursor: pointer;
             border-radius: 10px;
             font-weight: bold;
-            text-shadow: 1px 0 2px rgb(0, 0, 0);
+            text-shadow: 
+                -1px -1px 0 #000,  
+                 1px -1px 0 #000,
+                -1px  1px 0 #000,
+                 1px  1px 0 #000;
         }
 
         #startButton:hover {
@@ -591,6 +595,11 @@
             transition: color 0.2s;
             text-align: center;
             cursor: pointer;
+            text-shadow: 
+                -1px -1px 0 #000,  
+                 1px -1px 0 #000,
+                -1px  1px 0 #000,
+                 1px  1px 0 #000;
         }
 
         input[type=radio]:checked + label {
@@ -656,6 +665,37 @@
             -webkit-appearance: none;
             margin: 0; /* Optional: You might need to adjust the margin */
         }
+
+        .message {
+            position: fixed;
+            bottom: 3%;
+            right: -100%; /* Start position: completely outside the viewport on the right */
+            transform: translate(0, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 9999;
+            animation: slide-in 1s forwards, slide-out 2s forwards 2.5s;
+        }
+
+        @keyframes slide-in {
+            from {
+                right: -100%; /* Start position: completely outside the viewport on the right */
+            }
+            to {
+                right: 1%; /* End position: 1% from the right side of the viewport */
+            }
+        }
+
+        @keyframes slide-out {
+            from {
+                right: 1%; /* Start position: 1% from the right side of the viewport */
+            }
+            to {
+                right: -100%; /* End position: completely outside the viewport on the right */
+            }
+        }
     </style>
 </head>
 <body>
@@ -676,6 +716,7 @@
         <div id="processingOptionsText">
             <!-- The processing options will be dynamically added here -->
         </div>
+        <div style="height: 40px;"></div>
 
         <div class="options-container">
             <div class="option-count">
