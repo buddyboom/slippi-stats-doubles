@@ -765,12 +765,15 @@
         </div>
     </footer>
 
+    <script src="../version.js"></script>    
     <div id="about-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>made by <span><a href="https://twitter.com/buddyboom_" target="_blank" style="color: #1DA1F2;" id="twitter-link">buddyboom</a> <img src="../images/twitter.png" alt="Twitter icon" style="width: 24px; height: 24px;"></span></h2>
+            <h2>made by <span><a href="https://twitter.com/buddyboom_" target="_blank" style="color: #1DA1F2;" id="twitter-link">buddyboom</a> <img src="../images/twitter.png" alt="Twitter icon" style="width: 24px; height: 24px;"></span> </h2>
             <p><img src="../images/buddyboom.png" alt="buddyboom profile pic" style="max-width: 200px; max-height: 200px"></p>
             
+            <p>Version: <span id="version"></span></p>
+
             <div class="button-container">
                 <button class="startButton" id="startButton" onclick="return false;">Process Files</button>
                 <span class="button-description">Computes stats for all files in your chosen folder. Searches subfolders. Does not clear screen of previously processed files.</span>
@@ -802,7 +805,10 @@
                 icon by <a target="_blank" href="https://icons8.com" style="color: rgba(255, 255, 255, 0.55)">Icons8</a>
         </div>
     </div>
-    
+    <script>
+        document.getElementById('version').textContent = VERSION;
+    </script>
+
     <script src="renderer.js"></script>
 </body>
 </html>
