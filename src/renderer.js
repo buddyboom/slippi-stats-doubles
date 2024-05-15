@@ -208,6 +208,8 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         });
 
         const timestamp = convertUTCtoLocalTime(metadata.startAt, 'CT');
+        headerDiv.setAttribute('data-timestamp', timestamp); // to retrieve in sorting function
+
         const stage = stages.getStageName(settings.stageId);
         const gamelength = calculateGameLength(latestFrame);
 
@@ -731,6 +733,51 @@ function displayProcessingOptions() {
     // }
 }
 
+// // Event listener for the sortProcessedFiles button
+// document.getElementById('sortProcessedFiles').addEventListener('click', () => {
+//     const fileOrderRadio = document.querySelector('input[name="fileOrder"]:checked');
+//     const fileOrder = fileOrderRadio ? fileOrderRadio.value : 'Descending';
+
+//     // Sort processed files based on the selected file order
+//     sortAndRearrangeCollapsibles(fileOrder);
+// });
+
+function sortAndRearrangeCollapsibles(order) {
+    // Retrieve the container elements
+    const collapsibleContainer = document.getElementById('collapsibleContainer');
+    const tableContainer = document.getElementById('tableContainer');
+
+    // Retrieve the DOM elements representing the collapsibles and their tables
+    const collapsibles = collapsibleContainer.querySelectorAll('.collapsible-header');
+
+    // Convert NodeList to array for easier manipulation
+    const collapsiblesArray = Array.from(collapsibles);
+
+    // Sort the arrays based on the order (Ascending or Descending)
+    if (order === 'Ascending') {
+        collapsiblesArray.sort((a, b) => {
+            const timestampA = Date.parse(a.getAttribute('data-timestamp'));
+            const timestampB = Date.parse(b.getAttribute('data-timestamp'));
+            return timestampA - timestampB;
+        });
+    } else {
+        collapsiblesArray.sort((a, b) => {
+            const timestampA = Date.parse(a.getAttribute('data-timestamp'));
+            const timestampB = Date.parse(b.getAttribute('data-timestamp'));
+            return timestampB - timestampA;
+        });
+    }
+
+    // Clear the container elements
+    collapsibleContainer.innerHTML = '';
+    tableContainer.innerHTML = '';
+
+    // Append the sorted collapsibles and tables back to their respective containers
+    collapsiblesArray.forEach(collapsible => {
+        collapsibleContainer.appendChild(collapsible.parentNode); // Append the parent node to maintain the collapsible structure
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM content loaded");
 
@@ -770,6 +817,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     incrementBtn.addEventListener('click', function() {
         customFileCountInput.value++;
+    });
+
+    // Add event listeners to sorting options
+    document.getElementById('mostRecentOption').addEventListener('click', function() {
+        sortAndRearrangeCollapsibles('Descending');
+        document.getElementById('sortDropdown').classList.remove('show');
+    });
+
+    document.getElementById('leastRecentOption').addEventListener('click', function() {
+        sortAndRearrangeCollapsibles('Ascending');
+        document.getElementById('sortDropdown').classList.remove('show');
     });
 
     const aboutModal = document.getElementById('about-modal');

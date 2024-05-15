@@ -571,7 +571,7 @@
             display: flex;
             min-width: 200px;
             /* border: dashed black 1px; */
-            border-radius: 20px;
+            border-radius: 10px;
             background-color: #000000;
             margin-top: 10px;
         }
@@ -582,7 +582,7 @@
             left: 1px;
             width: calc(50% - 1px);
             height: calc(100% - 2px);
-            border-radius: 20px;
+            border-radius: 10px;
             transition: transform 0.2s;
             background-color: green;
         }
@@ -696,6 +696,68 @@
                 right: -100%; /* End position: completely outside the viewport on the right */
             }
         }
+        
+        .dropbtn {
+            background-color: transparent; /* Transparent background */
+            border: 1px solid rgba(255, 255, 255, 0.35); /* Slightly visible outline */
+            border-radius: 10px;
+            color: white;
+            padding: 16px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .dropbtn:hover {
+            cursor:default;
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.75); /* Slightly visible outline */
+        }
+
+        /* Dropdown container */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            min-width: 160px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+            border-radius: 10px;
+            overflow:hidden; /* borders are rounded with this set */
+            z-index: 1;
+            opacity: 0; /* Initially hidden */
+            transition: opacity 0.3s ease; /* Transition effect */
+        }
+
+        /* Show dropdown content when hovering over dropdown or options */
+        .dropdown:hover .dropdown-content,
+        .dropdown-content:hover {
+            display: block;
+            transition: opacity 0.3s ease; /* Transition effect */
+            opacity: 1; /* Fading in */
+        }
+
+        /* Fade out dropdown content when not hovering over dropdown */
+        .dropdown:not(:hover) .dropdown-content:not(:hover) {
+            opacity: 0; /* Fading out */
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 10px 14px; /* Reduced padding */
+            text-decoration: none;
+            display: block;
+            background-color: #333; /* Dark background color */
+            transition: background-color 0.3s ease;
+        }
+
+        /* Change color of dropdown options on hover */
+        .dropdown-content a:hover {
+            background-color: #555; /* Darker background color on hover */
+            transition: background-color 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -747,6 +809,14 @@
                         <span class="selected" aria-hidden="true"></span>
                     </div>
                 </fieldset>
+            </div>
+            <!-- <button id="sortProcessedFiles">Sort Processed Files</button> -->
+            <div class="dropdown">
+                <button class="dropbtn">Sort files</button>
+                <div id="sortDropdown" class="dropdown-content">
+                    <a href="#" id="mostRecentOption">Newest first</a>
+                    <a href="#" id="leastRecentOption">Oldest first</a>
+                </div>
             </div>
         </div>
         
