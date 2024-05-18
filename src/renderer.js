@@ -23,9 +23,7 @@ const getKOIconPath = (teamId) => {
 };
 
 const getStagePath = (stageId) => {
-    console.log('stageId: ' + stageId)
     const stagePng = path.join(__dirname, `../images/stages/${stageId}.png`);
-    console.log('stagePng: '+stagePng);
     return stagePng;
 };
 
@@ -154,10 +152,8 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
             stockCounts.forEach((stocksRemaining, index) => {
                 if (stocksRemaining > 0) {
                     winningTeamColor = TeamColors[settings.players[index].teamId].toLowerCase();
-                    // console.log("winningTeamColor found: " + winningTeamColor);
                 }
             });
-        // console.log("winningTeamColor: " + winningTeamColor);
         }
 
         // Construct header text with date, time, Connect Code, and stage
@@ -170,7 +166,6 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
                     case 3:
                         if (teamColorClass === ("team-"+winningTeamColor)) {
                             teamColorClass += '-winner';
-                            // console.log("new teamColorClass: " +teamColorClass)
                         }
                         break;
                     case 7:
@@ -179,7 +174,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
                         }
                         break;
                     default:
-                        console.log("Unknown gameEnd.gameEndMethod: " + gameEnd.gameEndMethod)
+                        console.log(metadata.startAt+" Unknown gameEnd.gameEndMethod: " + gameEnd.gameEndMethod)
                         break;
                 }                
             }
@@ -262,11 +257,18 @@ function appendCollapsibleSection(section) {
     container.appendChild(section);
 }
 
-function computeStats(gameFile) {
+async function computeStats(gameFile, totalFiles, singlesChecked) {
     const game = new SlippiGame(gameFile);
+    const settings = game.getSettings();
+
+    // Skip processing singles games
+    if (singlesChecked && !settings.isTeams) {
+        console.log(`Skipping processing for '${gameFile}' as it is a singles game and ignoreSingles is checked.`);
+        return 'skipped'; // Indicate that the game was skipped
+    }
+
     const metadata = game.getMetadata();
     const stats = game.getStats();
-    const settings = game.getSettings();
     const latestFrame = game.getLatestFrame();
     const gameEnd = game.getGameEnd();
 
@@ -348,6 +350,11 @@ function computeStats(gameFile) {
         // Append the table to the collapsible body
         collapsibleBody.appendChild(table);
     }
+    // const processedCount = document.getElementById('processed-count');
+    // processedCount.textContent = `${parseInt(processedCount.textContent) + 1} / ${totalFiles}`;
+
+    // Indicate that the game was not skipped
+    return 'processed';
 }
 
 // Function to add player data to the table
@@ -585,7 +592,6 @@ const ProcessedFilesModule = (() => {
     };
 })();
 
-// Function to handle processing files
 async function processFiles() {
     // Check if a folder is selected
     const selectedFolder = getSelectedFolderFromLocalStorage();
@@ -632,39 +638,45 @@ async function processFiles() {
     const loadingBar = document.getElementById('progress');
     loadingText.style.display = 'block';
     loadingBar.style.width = '0';
-    
+
     let processedCount = 0;
-    // Process files asynchronously
+    let filesProcessed = 0; // Track the number of files processed, excluding singles games
+    let singlesChecked = document.getElementById('ignoreSingles').checked; // Check if "Ignore singles games" is checked
     for (let i = 0; i < gameFiles.length && processedCount < totalFiles; i++) {
         const gameFile = gameFiles[i];
         const fileName = gameFile.split('\\').pop(); // Get the file name
-    
+
         // Check if the file has already been processed
         if (ProcessedFilesModule.hasProcessedFile(fileName)) {
             console.log(`File '${fileName}' has already been processed.`);
             continue; // Skip processing
         }
-    
+
         // Calculate progress and update the loading bar
         const progress = ((processedCount + 1) / totalFiles) * 100;
         loadingBar.style.width = `${progress}%`;
-    
+
         // Update loading text
         loadingText.textContent = `${processedCount}/${totalFiles}`;
-    
+
         // Compute stats asynchronously
         await new Promise(resolve => {
             setTimeout(() => {
-                computeStats(gameFile);
-                resolve();
+                // Pass the totalFiles argument to the computeStats function
+                computeStats(gameFile, totalFiles, singlesChecked).then(result => {
+                    // Increment the processed count if a non-singles game is found
+                    if (result !== 'skipped') {
+                        processedCount++;
+                        filesProcessed++;
+                        // Add the processed file to the set of processed files
+                        ProcessedFilesModule.addProcessedFile(fileName);
+                        console.log(`File '${fileName}' processed successfully.`);
+                    }
+                    // Resolve the promise
+                    resolve();
+                });
             }, 0); // Execute in the next event loop iteration
         });
-    
-        // Add the processed file to the set of processed files
-        ProcessedFilesModule.addProcessedFile(fileName);
-        console.log(`File '${fileName}' processed successfully.`);
-
-        processedCount++;
     }
     const message = document.createElement('div');
     message.classList.add('message');
