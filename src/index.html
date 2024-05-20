@@ -554,6 +554,7 @@
         .file-options {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .option-count {
@@ -615,6 +616,35 @@
         .ignore-singles label {
             /* Display on a single line */
             white-space: nowrap;
+        }
+
+        .calendar-selectors {
+            margin-top: 40px; /* Adjust margin as needed */
+            margin-right: 20px; /* Adjust margin as needed */
+        }
+
+        .date-range-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .date-range-container input[type="date"] {
+            background-color: #333; /* Dark background color */
+            color: white; /* Text color */
+            border: 1px solid #555; /* Border color */
+            border-radius: 5px;
+            padding: 5px;
+            margin: 0 5px; /* Adjust margin as needed */
+        }
+
+        .date-range-container span {
+            color: white; /* Text color */
+        }
+
+        /* Dark theme for the error message */
+        #dateError {
+            color: red;
+            display: none;
         }
 
         legend {
@@ -894,6 +924,16 @@
                     <a href="#" id="leastRecentOption">Oldest first</a>
                 </div>
             </div>
+
+        </div>
+        <div class="calendar-selectors">
+            <label for="startDate">File Date Range:</label>
+            <div class="date-range-container">
+                <input type="date" id="startDate" name="startDate">
+                <span>-</span>
+                <input type="date" id="endDate" name="endDate">
+            </div>
+            <p id="dateError" style="color: red; display: none;">End date must be on or after start date.</p>
         </div>
         
     </header>
@@ -916,8 +956,6 @@
             <span class="close">&times;</span>
             <h2>made by <span><a href="https://twitter.com/buddyboom_" target="_blank" style="color: #1DA1F2;" id="twitter-link">buddyboom</a> <img src="../images/twitter.png" alt="Twitter icon" style="width: 24px; height: 24px;"></span> </h2>
             <p><img src="../images/buddyboom.png" alt="buddyboom profile pic" style="max-width: 200px; max-height: 200px"></p>
-            
-            <p>Version: 1.2.8</p>
 
             <div class="button-container">
                 <button class="startButton" id="startButton" onclick="return false;">Process Files</button>
@@ -946,8 +984,6 @@
 
             <h3><a href="https://github.com/project-slippi/slippi-js/tree/feat/doubles" target="_blank" style="color: #1DA1F2;">slippi-js feat/doubles</a></h3>
             <p>This app uses a very old (May 23, 2021) version of .slp parsing that is compatible with doubles. Stats may not be 100% accurate.</p>
-            <a target="_blank" href="https://icons8.com/icon/11825qXq70O3/super-smash-bros" style="color: rgba(255, 255, 255, 0.55)">Super Smash Bros</a> 
-                icon by <a target="_blank" href="https://icons8.com" style="color: rgba(255, 255, 255, 0.55)">Icons8</a>
         </div>
     </div>
 

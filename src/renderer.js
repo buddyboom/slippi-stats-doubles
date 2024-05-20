@@ -257,17 +257,30 @@ function appendCollapsibleSection(section) {
     container.appendChild(section);
 }
 
-async function computeStats(gameFile, totalFiles, singlesChecked) {
+async function computeStats(gameFile, totalFiles, singlesChecked, startDate, endDate) {
     const game = new SlippiGame(gameFile);
     const settings = game.getSettings();
 
-    // Skip processing singles games
     if (singlesChecked && !settings.isTeams) {
-        console.log(`Skipping processing for '${gameFile}' as it is a singles game and ignoreSingles is checked.`);
-        return 'skipped'; // Indicate that the game was skipped
+        console.log(`'${gameFile}': singles game when ignoreSingles is checked.`);
+        return 'skipped';
     }
 
     const metadata = game.getMetadata();
+    // dates compared in UTC
+    const fileStartDate = convertUTCtoLocalTime(metadata.startAt, 'CT');
+    const datePart = fileStartDate.split(' ')[0]; // Split at the space and get the first part
+    const [month, day, year] = datePart.split('/');
+    const formattedDate = new Date(`${year}-${month}-${day}`);
+    
+    const startDateObject = new Date(startDate);
+    const endDateObject = new Date(endDate);
+    
+    if (formattedDate < startDateObject || formattedDate > endDateObject) {
+        console.log(`'${gameFile}': game date ${formattedDate} outside of user selected dates ${startDateObject} - ${endDateObject}`);
+        return 'skipped';
+    }
+
     const stats = game.getStats();
     const latestFrame = game.getLatestFrame();
     const gameEnd = game.getGameEnd();
@@ -640,8 +653,11 @@ async function processFiles() {
     loadingBar.style.width = '0';
 
     let processedCount = 0;
-    let filesProcessed = 0; // Track the number of files processed, excluding singles games
-    let singlesChecked = document.getElementById('ignoreSingles').checked; // Check if "Ignore singles games" is checked
+    let filesProcessed = 0; // Track the number of files processed
+    let singlesChecked = document.getElementById('ignoreSingles').checked;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    console.log('startDate: '+ startDate + ' endDate '+endDate)
     for (let i = 0; i < gameFiles.length && processedCount < totalFiles; i++) {
         const gameFile = gameFiles[i];
         const fileName = gameFile.split('\\').pop(); // Get the file name
@@ -663,27 +679,25 @@ async function processFiles() {
         await new Promise(resolve => {
             setTimeout(() => {
                 // Pass the totalFiles argument to the computeStats function
-                computeStats(gameFile, totalFiles, singlesChecked).then(result => {
-                    // Increment the processed count if a non-singles game is found
+                computeStats(gameFile, totalFiles, singlesChecked, startDate, endDate).then(result => {
                     if (result !== 'skipped') {
                         processedCount++;
                         filesProcessed++;
-                        // Add the processed file to the set of processed files
+
                         ProcessedFilesModule.addProcessedFile(fileName);
                         console.log(`File '${fileName}' processed successfully.`);
                     }
-                    // Resolve the promise
                     resolve();
                 });
-            }, 0); // Execute in the next event loop iteration
+            }, 0);
         });
     }
     const message = document.createElement('div');
     message.classList.add('message');
-    message.textContent = 'Processing completed.';
+    message.textContent = filesProcessed + (filesProcessed === 1 ? ' file' : ' files') + ' processed.';
     document.body.appendChild(message);
 
-    // Remove the message after 3 seconds (adjust the delay as needed)
+    // Remove the message after 5 seconds
     setTimeout(() => {
         document.body.removeChild(message);
     }, 5000);
@@ -830,6 +844,27 @@ document.addEventListener('DOMContentLoaded', function() {
     incrementBtn.addEventListener('click', function() {
         customFileCountInput.value++;
     });
+
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const dateError = document.getElementById('dateError');
+
+    // Function to validate the end date
+    function validateEndDate() {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+        if (endDate < startDate) {
+            dateError.style.display = 'block';
+            endDateInput.value = ''; // Clear the end date input
+            return false;
+        } else {
+            dateError.style.display = 'none';
+            return true;
+        }
+    }
+
+    // Event listener for end date input change
+    endDateInput.addEventListener('change', validateEndDate);
 
     // Add event listeners to sorting options
     document.getElementById('mostRecentOption').addEventListener('click', function() {
