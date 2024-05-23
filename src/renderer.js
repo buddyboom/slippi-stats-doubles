@@ -148,7 +148,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
 
         let winningTeamColor = null;
 
-        if(gameEnd != null && gameEnd.gameEndMethod === 3) {
+        if (gameEnd != null && gameEnd.gameEndMethod === 3) {
             stockCounts.forEach((stocksRemaining, index) => {
                 if (stocksRemaining > 0) {
                     winningTeamColor = TeamColors[settings.players[index].teamId].toLowerCase();
@@ -161,10 +161,10 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
             let teamColorClass = `team-${TeamColors[player.teamId].toLowerCase()}`;
             const connectCode = player.connectCode;
 
-            if(gameEnd != null) { // null === game crashed
+            if (gameEnd != null) { // null === game crashed
                 switch (gameEnd.gameEndMethod) {
                     case 3:
-                        if (teamColorClass === ("team-"+winningTeamColor)) {
+                        if (teamColorClass === ("team-" + winningTeamColor)) {
                             teamColorClass += '-winner';
                         }
                         break;
@@ -174,13 +174,13 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
                         }
                         break;
                     default:
-                        console.log(metadata.startAt+" Unknown gameEnd.gameEndMethod: " + gameEnd.gameEndMethod)
+                        console.log(metadata.startAt + " Unknown gameEnd.gameEndMethod: " + gameEnd.gameEndMethod);
                         break;
-                }                
+                }
             }
 
             // Get the character icon path
-            const characterId = player.characterId; 
+            const characterId = player.characterId;
             const color = player.characterColor;
             const characterIconPath = getCharacterIconPath(characterId, color);
 
@@ -191,8 +191,22 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
 
             // Create a span for the connect code
             const connectCodeSpan = document.createElement('span');
-            connectCodeSpan.textContent = connectCode;
             connectCodeSpan.classList.add('connect-code', teamColorClass);
+
+            // Connect code font weight: <b>ZAP</b>#151
+            const [prefix, suffix] = connectCode.split('#');
+
+            const prefixSpan = document.createElement('span');
+            prefixSpan.style.fontWeight = 'bold';
+            prefixSpan.textContent = prefix;
+
+            const suffixSpan = document.createElement('span');
+            suffixSpan.style.fontWeight = 'normal';
+            suffixSpan.textContent = `#${suffix}`;
+
+            // Append the parts to the connect code span
+            connectCodeSpan.appendChild(prefixSpan);
+            connectCodeSpan.appendChild(suffixSpan);
 
             // Concatenate the character icon and connect code
             const playerInfoSpan = document.createElement('span');
@@ -203,10 +217,12 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         });
 
         const timestamp = convertUTCtoLocalTime(metadata.startAt, 'CT');
-        headerDiv.setAttribute('data-timestamp', timestamp); // to retrieve in sorting function
+        headerDiv.setAttribute('data-timestamp', timestamp); // to retrieve in sortDropdown
 
         const stage = stages.getStageName(settings.stageId);
         const gamelength = calculateGameLength(latestFrame);
+        const gamelengthSeconds = parseGameLength(gamelength);
+        const gamelengthPercentage = (gamelengthSeconds / (8 * 60)) * 100; // Calculate percentage of game length out of 8 minutes
 
         // Create elements for timestamp, stage, and gamelength
         const timestampSpan = document.createElement('span');
@@ -221,17 +237,31 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         gamelengthSpan.textContent = gamelength;
         gamelengthSpan.classList.add('small-text');
 
-        // Concatenate all elements into the header text
-        const headerText = document.createElement('div');
-        headerText.appendChild(timestampSpan);
-        connectCodes.forEach(connectCodeSpan => {
-            headerText.appendChild(connectCodeSpan);
-        });
-        headerText.appendChild(stageSpan);
-        headerText.innerHTML += ` `;
-        headerText.appendChild(gamelengthSpan);
+        const timerIcon = createTimerIcon(gamelengthPercentage);
 
-        headerDiv.appendChild(headerText);
+        // Create a container for player info
+        const playerInfoContainer = document.createElement('div');
+        playerInfoContainer.classList.add('player-info-container');
+        connectCodes.forEach(connectCodeSpan => {
+            playerInfoContainer.appendChild(connectCodeSpan);
+        });
+
+        // Create a container for timestamp, stage, and gamelength
+        const gameInfoContainer = document.createElement('div');
+        gameInfoContainer.classList.add('game-info-container');
+        gameInfoContainer.appendChild(timestampSpan);
+        gameInfoContainer.appendChild(timerIcon);
+        gameInfoContainer.appendChild(gamelengthSpan);
+        gameInfoContainer.appendChild(stageSpan);
+
+        // Create a container for header content
+        const headerContainer = document.createElement('div');
+        headerContainer.classList.add('header-container');
+        headerContainer.appendChild(playerInfoContainer);
+        headerContainer.appendChild(gameInfoContainer);
+
+        // Append header content to the headerDiv
+        headerDiv.appendChild(headerContainer);
 
         const bodyDiv = document.createElement('div');
         bodyDiv.classList.add('collapsible-body');
@@ -248,8 +278,43 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
     }
 }
 
+function parseGameLength(gamelength) {
+    const [minutes, seconds] = gamelength.split('m');
+    return parseInt(minutes) * 60 + parseInt(seconds.replace('s', ''));
+}
+
 function isLRASInitiator(gameEnd, playerIndex) {
     return parseInt(gameEnd.lrasInitiatorIndex) === playerIndex;
+}
+
+function createTimerIcon(gamelengthPercentage) {
+    const timerIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    timerIcon.setAttribute('class', 'timer-icon');
+    timerIcon.setAttribute('viewBox', '0 0 100 100');
+    timerIcon.setAttribute('width', '20');
+    timerIcon.setAttribute('height', '20');
+
+    const timerBackground = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    timerBackground.setAttribute('cx', '50');
+    timerBackground.setAttribute('cy', '50');
+    timerBackground.setAttribute('r', '40');
+    timerBackground.setAttribute('stroke', '#ddd');
+    timerBackground.setAttribute('stroke-width', '10');
+    timerBackground.setAttribute('fill', 'none');
+
+    const timerProgress = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const angle = (gamelengthPercentage / 100) * 360; // Calculate angle based on percentage
+    const largeArcFlag = angle > 180 ? 1 : 0; // Set the largeArcFlag depending on angle
+    const x = 50 + 40 * Math.cos(Math.PI * (90 - angle) / 180); // Calculate the end point of the arc
+    const y = 50 - 40 * Math.sin(Math.PI * (90 - angle) / 180); // Calculate the end point of the arc
+    const pathData = `M50,50 L50,10 A40,40 0 ${largeArcFlag},1 ${x},${y} Z`; // Construct the path data
+    timerProgress.setAttribute('d', pathData);
+    timerProgress.setAttribute('fill', '#FFFFFF');
+
+    timerIcon.appendChild(timerBackground);
+    timerIcon.appendChild(timerProgress);
+
+    return timerIcon;
 }
 
 function appendCollapsibleSection(section) {
