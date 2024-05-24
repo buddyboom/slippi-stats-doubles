@@ -397,8 +397,8 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
         // Add player data rows
         // addPlayerData(table, 'Character', settings.players.map(player => characters.getCharacterShortName(player.characterId)));
         addPlayerData(table, 'Stocks Remaining', stockCounts, settings);
-        addPlayerData(table, 'Total Damage', stats.overall.map(playerStats => `${Math.round(playerStats.totalDamage)}`), settings);
         addPlayerData(table, 'KOs', stats.overall.map(playerStats => `${playerStats.killCount}`), settings);
+        addPlayerData(table, 'Total Damage', stats.overall.map(playerStats => `${Math.round(playerStats.totalDamage)}`), settings);
         addPlayerData(table, 'Grabs', stats.actionCounts.map(actionCounts => 
             `${actionCounts.grabCount.success} / ${actionCounts.grabCount.fail + actionCounts.grabCount.success}`));
         addPlayerData(table, 'Throws (f / b / u / d)', stats.actionCounts.map(actionCounts => 
@@ -466,136 +466,145 @@ function addPlayerData(table, label, data, settings) {
     labelCell.textContent = label;
     labelCell.style.fontWeight = 'bold';
 
+    let teamColors;
+
     // Determine team color and add corresponding class to value cells
-    if (label === 'Team Color') {
-        const teamColors = data;
-        const columnIndex = Array.from(row.parentNode.children).indexOf(row);
-        valueCells.forEach((cell, index) => {
-            const teamColor = teamColors[index];
-            const columnCells = Array.from(table.querySelectorAll(`tr td:nth-child(${index + 2})`));
-            columnCells.forEach(columnCell => {
-                columnCell.classList.add(`team-${teamColor}`);
+    switch (label) {
+        case 'Team Color':
+            teamColors = data;
+            const columnIndex = Array.from(row.parentNode.children).indexOf(row);
+            valueCells.forEach((cell, index) => {
+                const teamColor = teamColors[index];
+                const columnCells = Array.from(table.querySelectorAll(`tr td:nth-child(${index + 2})`));
+                columnCells.forEach(columnCell => {
+                    columnCell.classList.add(`team-${teamColor}`);
+                });
             });
-        });
-    } else if (label === 'Total Damage' && settings) {
-        const teamColors = settings.players.map(player => {
-            switch (player.teamId) {
-                case 0: // RED
-                    return '#F15959';
-                case 1: // BLU
-                    return '#6565FE';
-                case 2: // GRN
-                    return '#4CE44C';
-                default:
-                    return '#000000'; // Default to black if unknown team
-            }
-        });
-        // Calculate the total damage for each team
-        const teamTotalDamage = {};
-        for (const [index, playerDamage] of data.entries()) {
-            const teamColor = teamColors[index];
-            if (!(teamColor in teamTotalDamage)) {
-                teamTotalDamage[teamColor] = 0;
-            }
-            teamTotalDamage[teamColor] += parseInt(playerDamage);
-        }
+            break;
+        case 'KOs':
+            const KOCounts = data;
+            KOCounts.forEach((count, index) => {
+                const teamId = settings.players[index].teamId
     
-        // Apply background gradient based on percentage of team damage
-        valueCells.forEach((cell, index) => {
-            const teamColor = teamColors[index];
-            const playerDamage = parseInt(data[index]);
-            const teamTotal = teamTotalDamage[teamColor];
-            const percentage = (playerDamage / teamTotal) * 100;
-            const gradientHeight = `${percentage}%`;
-            const gradientColor = `rgba(${parseInt(teamColor.substring(1, 3), 16)}, ${parseInt(teamColor.substring(3, 5), 16)}, ${parseInt(teamColor.substring(5, 7), 16)}, 0.3)`;
-            cell.style.background = `linear-gradient(to top, ${gradientColor} ${gradientHeight}, transparent ${gradientHeight})`;
-        });
-    } else if (label === 'KOs') {
-        const KOCounts = data;
-        KOCounts.forEach((count, index) => {
-            const teamId = settings.players[index].teamId
-    
-            // Clear the contents of the cell before appending the icons
-            valueCells[index].textContent = '';
-        
-            // Create a span element to hold the text content
-            // const countSpan = document.createElement('span');
-            // countSpan.textContent = '×' + count;
-            // countSpan.style.transform = 'translateX(20px)';
-            
-            for (let i = 0; i < count; i++) {
-                const KOIcon = document.createElement('img');
-                const iconPath = getKOIconPath(teamId);
-                KOIcon.src = iconPath;
-                KOIcon.classList.add('KO-icon');
-                KOIcon.style.transform = 'translateY(2px)';
-                KOIcon.style.marginTop = '0px';
-                KOIcon.style.marginBottom = '0';
-                valueCells[index].appendChild(KOIcon); // Append each KO icon to the value cell
-            }
-    
-            // Append the count span after appending all the KO icons
-            // valueCells[index].appendChild(countSpan);
-    });
-    } else if (label === 'Stocks Remaining' && settings && settings.players) {
-        const stocksRemaining = data;
-
-        stocksRemaining.forEach((stocks, index) => {
-            if (settings.players[index]) {
-                const characterId = settings.players[index].characterId;
-                const color = settings.players[index].characterColor;
-
-                // Clear the number in the cell before appending the icons
+                // Clear the contents of the cell before appending the icons
                 valueCells[index].textContent = '';
-
-                if (stocks > 0) {
-                    for (let i = 0; i < stocks; i++) {
+            
+                // Create a span element to hold the text content
+                // const countSpan = document.createElement('span');
+                // countSpan.textContent = '×' + count;
+                // countSpan.style.transform = 'translateX(20px)';
+                
+                for (let i = 0; i < count; i++) {
+                    const KOIcon = document.createElement('img');
+                    const iconPath = getKOIconPath(teamId);
+                    KOIcon.src = iconPath;
+                    KOIcon.classList.add('KO-icon');
+                    KOIcon.style.transform = 'translateY(2px)';
+                    KOIcon.style.marginTop = '0px';
+                    KOIcon.style.marginBottom = '0';
+                    valueCells[index].appendChild(KOIcon); // Append each KO icon to the value cell
+                }
+        
+                // Append the count span after appending all the KO icons
+                // valueCells[index].appendChild(countSpan);
+            });
+            break;
+        case 'Total Damage':
+            teamColors = settings.players.map(player => {
+                switch (player.teamId) {
+                    case 0: // RED
+                        return '#F15959';
+                    case 1: // BLU
+                        return '#6565FE';
+                    case 2: // GRN
+                        return '#4CE44C';
+                    default:
+                        return '#000000'; // Default to black if unknown team
+                }
+            });
+            // Calculate the total damage for each team
+            const teamTotalDamage = {};
+            for (const [index, playerDamage] of data.entries()) {
+                const teamColor = teamColors[index];
+                if (!(teamColor in teamTotalDamage)) {
+                    teamTotalDamage[teamColor] = 0;
+                }
+                teamTotalDamage[teamColor] += parseInt(playerDamage);
+            }
+        
+            // Apply background gradient based on percentage of team damage
+            valueCells.forEach((cell, index) => {
+                const teamColor = teamColors[index];
+                const playerDamage = parseInt(data[index]);
+                const teamTotal = teamTotalDamage[teamColor];
+                const percentage = (playerDamage / teamTotal) * 100;
+                const gradientHeight = `${percentage}%`;
+                const gradientColor = `rgba(${parseInt(teamColor.substring(1, 3), 16)}, ${parseInt(teamColor.substring(3, 5), 16)}, ${parseInt(teamColor.substring(5, 7), 16)}, 0.3)`;
+                cell.style.background = `linear-gradient(to top, ${gradientColor} ${gradientHeight}, transparent ${gradientHeight})`;
+            });
+            break;
+        case 'Stocks Remaining':
+            const stocksRemaining = data;
+    
+            stocksRemaining.forEach((stocks, index) => {
+                if (settings.players[index]) {
+                    const characterId = settings.players[index].characterId;
+                    const color = settings.players[index].characterColor;
+    
+                    // Clear the number in the cell before appending the icons
+                    valueCells[index].textContent = '';
+    
+                    if (stocks > 0) {
+                        for (let i = 0; i < stocks; i++) {
+                            const stockIcon = document.createElement('img');
+                            const iconPath = getCharacterIconPath(characterId, color);
+                            stockIcon.src = iconPath;
+                            stockIcon.classList.add('character-icon');
+                            stockIcon.style.transform = 'translateY(2px)';
+                            stockIcon.style.marginTop = '0px';
+                            stockIcon.style.marginBottom = '0';
+                            valueCells[index].appendChild(stockIcon); // Append each stock icon to the value cell
+                        }
+                    } else {
                         const stockIcon = document.createElement('img');
                         const iconPath = getCharacterIconPath(characterId, color);
                         stockIcon.src = iconPath;
-                        stockIcon.classList.add('character-icon');
+                        stockIcon.classList.add('character-icon'); 
                         stockIcon.style.transform = 'translateY(2px)';
                         stockIcon.style.marginTop = '0px';
-                        stockIcon.style.marginBottom = '0';
-                        valueCells[index].appendChild(stockIcon); // Append each stock icon to the value cell
+                        stockIcon.style.opacity = '0.3'; // Apply opacity to stock icon if stocks are 0
+                        valueCells[index].appendChild(stockIcon); // Append the stock icon to the value cell
                     }
-                } else {
-                    const stockIcon = document.createElement('img');
-                    const iconPath = getCharacterIconPath(characterId, color);
-                    stockIcon.src = iconPath;
-                    stockIcon.classList.add('character-icon'); 
-                    stockIcon.style.transform = 'translateY(2px)';
-                    stockIcon.style.marginTop = '0px';
-                    stockIcon.style.opacity = '0.3'; // Apply opacity to stock icon if stocks are 0
-                    valueCells[index].appendChild(stockIcon); // Append the stock icon to the value cell
                 }
-            }
-        });
-    } else if (label === 'L-Cancel %' && settings) {
-        const teamColors = settings.players.map(player => {
-            switch (player.teamId) {
-                case 0: // RED
-                    return '#F15959';
-                case 1: // BLU
-                    return '#6565FE';
-                case 2: // GRN
-                    return '#4CE44C';
-                default:
-                    return '#000000'; // Default to black if unknown team
-            }
-        });
-        const lcancelsPercentages = data.map(item => {
-            const match = item.match(/\d+%/)
-            return match ? match[0] : null; // Return the matched percentage or null if not found
-        }).filter(Boolean);
-
-        lcancelsPercentages.forEach((percentage, index) => {
-            const teamColor = teamColors[index];
-            const gradientWidth = percentage;
-            const gradientColor = `rgba(${parseInt(teamColor.substring(1, 3), 16)}, ${parseInt(teamColor.substring(3, 5), 16)}, ${parseInt(teamColor.substring(5, 7), 16)}, 0.3)`;
-            valueCells[index].style.background = `linear-gradient(to right, ${gradientColor} ${gradientWidth}, transparent ${gradientWidth})`;
-        });
+            });
+            break;
+        case 'L-Cancel %':
+            teamColors = settings.players.map(player => {
+                switch (player.teamId) {
+                    case 0: // RED
+                        return '#F15959';
+                    case 1: // BLU
+                        return '#6565FE';
+                    case 2: // GRN
+                        return '#4CE44C';
+                    default:
+                        return '#000000'; // Default to black if unknown team
+                }
+            });
+            const lcancelsPercentages = data.map(item => {
+                const match = item.match(/\d+%/)
+                return match ? match[0] : null; // Return the matched percentage or null if not found
+            }).filter(Boolean);
+    
+            lcancelsPercentages.forEach((percentage, index) => {
+                const teamColor = teamColors[index];
+                const gradientWidth = percentage;
+                const gradientColor = `rgba(${parseInt(teamColor.substring(1, 3), 16)}, ${parseInt(teamColor.substring(3, 5), 16)}, ${parseInt(teamColor.substring(5, 7), 16)}, 0.3)`;
+                valueCells[index].style.background = `linear-gradient(to right, ${gradientColor} ${gradientWidth}, transparent ${gradientWidth})`;
+            });
+            break;
     }
+    
 
     // Apply alternating row shades
     const rowIndex = Array.from(table.rows).indexOf(row);
