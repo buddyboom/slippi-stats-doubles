@@ -679,6 +679,14 @@ const ProcessedFilesModule = (() => {
     };
 })();
 
+function showLoadingIcon() {
+    document.getElementById('loading-icon').style.display = 'flex';
+}
+
+function hideLoadingIcon() {
+    document.getElementById('loading-icon').style.display = 'none';
+}
+
 async function processFiles() {
     // Check if a folder is selected
     const selectedFolder = getSelectedFolderFromLocalStorage();
@@ -688,6 +696,8 @@ async function processFiles() {
         alert('Choose a folder first. (Select Folder)');
         return;
     }
+
+    showLoadingIcon(); 
 
     // Get the value of the file order radio buttons
     const fileOrderRadio = document.querySelector('input[name="fileOrder"]:checked');
@@ -770,6 +780,8 @@ async function processFiles() {
     message.classList.add('message');
     message.textContent = filesProcessed + (filesProcessed === 1 ? ' file' : ' files') + ' processed.';
     document.body.appendChild(message);
+
+    hideLoadingIcon();
 
     // Remove the message after 5 seconds
     setTimeout(() => {
