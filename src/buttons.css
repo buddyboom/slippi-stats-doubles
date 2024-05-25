@@ -1,0 +1,244 @@
+.button-container button {
+    margin-right: 10px;
+}
+
+.button-description {
+    margin-left: 5px;
+    flex-grow: 1;
+}
+
+button {
+    background-color: #555;
+    color: #eee;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease; /* Add transition effect */
+}
+
+button:hover {
+    background-color: #666;
+}
+
+#startButton {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 10px;
+    font-weight: bold;
+    text-shadow: 
+        -1px -1px 0 #000,  
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000;
+}
+
+#startButton:hover {
+    background-color: #57cc5b;
+}
+
+#refreshButton {
+    background-color: #f0f0f0;
+    color: #333;
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 10px; 
+    cursor: pointer;
+    margin-left: 5px; /* Add margin to the right */
+}
+
+#refreshButton:hover {
+    background-color: #d7d7d7; /* Slightly darker gray on hover */
+}
+
+#startButton, #refreshButton {
+    float: left;
+}
+
+#selectFolderButton {
+    background-color: #555;
+    color: #eee;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+    float: right;
+}
+
+#selectFolderButton:hover {
+    background-color: #666;
+}
+
+#openFolderButton {
+    background-color: #555;
+    color: #eee;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+    float: right;
+    margin-right: 5px;
+}
+
+#openFolderButton:hover {
+    background-color: #666;
+}
+
+.ignore-singles input[type="checkbox"] {
+    /* Hide the default checkbox */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /* Use a custom size */
+    width: 18px;
+    height: 18px;
+    /* Gray background when unchecked */
+    background-color: #ccc;
+    border: 1px solid #ccc; /* Add border for visibility */
+    cursor: pointer;
+    position: relative; /* Position relative for pseudo-element */
+}
+
+.ignore-singles input[type="checkbox"]:checked {
+    background-color: #4CAF50;
+}
+
+/* Custom checkbox indicator */
+.ignore-singles input[type="checkbox"]::before {
+    content: "\2705"; /* Checkmark character */
+    font-size: 19px;
+    color: white; /* Color of the checkmark */
+    position: absolute; /* Position absolute for positioning */
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the checkmark */
+    visibility: hidden; /* Hide the checkmark by default */
+}
+
+.ignore-singles input[type="checkbox"]:hover:not(:checked) {
+    background-color: #999999;
+}
+
+.ignore-singles input[type="checkbox"]:checked::before {
+    /* Show the checkmark when checked */
+    visibility: visible;
+}
+
+.ignore-singles label {
+    /* Display on a single line */
+    white-space: nowrap;
+}
+
+#expandCollapseButton {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background-color: #dcdcdc;
+    color: #000;
+    border: 1px solid #000;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+#expandCollapseButton:hover {
+    background-color: #ffffff;
+}
+
+.dropbtn {
+    background-color: transparent; /* Transparent background */
+    border: 1px solid rgba(255, 255, 255, 0.35); /* Slightly visible outline */
+    border-radius: 10px;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.dropbtn:hover {
+    cursor:default;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.75); /* Slightly visible outline */
+}
+
+/* Dropdown container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 160px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    border-radius: 10px;
+    overflow: hidden; /* borders are rounded with this set */
+    z-index: 1;
+    opacity: 0; /* Initially hidden */
+    right:0;
+}
+
+/* Show dropdown content when hovering over dropdown or options */
+.dropdown:hover .dropdown-content {
+    display: block;
+    transition: opacity 0.3s ease; /* Transition effect */
+    opacity: 1; /* Fading in */
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 10px 14px; /* Reduced padding */
+    text-decoration: none;
+    display: block;
+    background-color: #333; /* Dark background color */
+    transition: background-color 0.3s ease;
+}
+
+/* Change color of dropdown options on hover */
+.dropdown-content a:hover {
+    background-color: #555; /* Darker background color on hover */
+    transition: background-color 0.3s ease;
+}
+
+/* Close button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #fff;
+    text-decoration: none; /* Remove underline */
+    cursor: pointer;
+}
+
+.date-range-container input[type="date"] {
+    background-color: #333; /* Dark background color */
+    color: white; /* Text color */
+    border: 1px solid #555; /* Border color */
+    border-radius: 5px;
+    padding: 5px;
+    margin: 0 5px; /* Adjust margin as needed */
+}
+
+.date-range-container span {
+    color: white; /* Text color */
+}
+
+/* Dark theme for the error message */
+#dateError {
+    color: red;
+    display: none;
+}

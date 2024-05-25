@@ -1,0 +1,70 @@
+/* header connect code text styling */
+.connect-code {
+    text-shadow: 0 0 4px;
+}
+
+.team-red, .team-red-winner, .team-red-faded {
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-right: 5px;
+    font-weight: bold;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+                linear-gradient(to bottom, #F15959, #F15959);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    text-shadow: 0 0 3px rgb(0, 0, 0); 
+}
+
+.team-red-winner {
+    box-shadow: 0 0 0 3px gold;
+}
+
+.team-red-faded {
+    opacity: 0.5;
+}
+
+.team-blu, .team-blu-winner, .team-blu-faded {
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-right: 5px;
+    font-weight: bold;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+                linear-gradient(to bottom, #6565FE, #6565FE);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    text-shadow: 0 0 3px rgb(0, 0, 0);
+}
+
+.team-blu-winner {
+    box-shadow: 0 0 0 3px gold;
+}
+
+.team-blu-faded {
+    opacity: 0.5;
+}
+
+.team-grn, .team-grn-winner, .team-grn-faded {
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-right: 5px;
+    font-weight: bold;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+                linear-gradient(to bottom, #4CE44C, #4CE44C);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    text-shadow: 0 0 3px rgb(0, 0, 0);
+}
+
+.team-grn-winner {
+    box-shadow: 0 0 0 3px gold;
+}
+
+.team-grn-faded {
+    opacity: 0.5;
+}

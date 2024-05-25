@@ -1,0 +1,146 @@
+#tableContainer {
+    margin-top: 20px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px; /* Rounded corners */
+    overflow: hidden; /* Hide overflow content */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow effect */
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #333;
+    color: #eee;
+}
+
+th, td {
+    border: 1px solid #555;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #444;
+}
+
+/* Define styles for alternating row shades */
+.table-row-even {
+    background-color: rgba(0, 0, 0, 0.35);
+}
+
+.table-row-odd {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.gold-text {
+    color: #fdd90c;
+    font-weight: bold;
+}
+
+.player-info-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.game-info-container {
+    display: block;
+    margin-top: 10px;
+}
+
+.timer-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+    transform: translateY(4px);
+}
+
+.game-info-container span { 
+    margin-right: 20px;
+}
+
+.collapsible {
+    margin-bottom: 12px;
+}
+
+.collapsible-header {
+    display: flex;
+    align-items: center; 
+    justify-content: space-between;
+    /* background-color: #444; */
+    color: #eee;
+    padding: 10px;
+    padding-top: 0px;
+    cursor: pointer;
+    line-height: normal;
+    transition: background-color 0.3s ease;
+    border-radius: 8px;
+ }
+
+.collapsible-header * {
+    pointer-events: none; /* Disable pointer events on child elements, makes whole header clickable */
+}
+
+.stage-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure the image covers the entire space */
+    opacity: 0.25;
+    transition: opacity 0.3s ease;
+    z-index: -999; /* sit behind other header elements */
+}
+
+.collapsible-header:hover .stage-image {
+    opacity: 0.4;
+}
+
+.collapsible-body {
+    display: block; /* display collapsible body by default */
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.collapsible-body.show {
+    display: none; /* hide collapsible body when active */
+}
+
+/* border colors in table */
+.team-RED {
+    border: 1px solid #F15959;
+}
+
+.team-BLU {
+    border: 1px solid #6565FE;
+}
+
+.team-GRN {
+    border: 1px solid #4CE44C;
+}
+
+.character-icon {
+    width: 24px;
+    height: auto;
+    margin-top: 5px;
+    margin-left: 1px;
+    margin-right: 0px;
+    transform: translateY(6px);
+}
+
+.KO-icon {
+    width: 20px;
+    height: auto;
+    margin-right: 0px;
+}
+
+.small-text {
+    font-size: 0.9em;
+    text-shadow: 
+        -1px -1px 0 #000,  
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000;
+}
