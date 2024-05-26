@@ -223,6 +223,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         const gamelength = calculateGameLength(latestFrame);
         const gamelengthSeconds = parseGameLength(gamelength);
         const gamelengthPercentage = (gamelengthSeconds / (8 * 60)) * 100; // Calculate percentage of game length out of 8 minutes
+        headerDiv.setAttribute('data-length', gamelengthSeconds); // to sort by shortest/longest in sortDropdown
 
         // Create elements for timestamp, stage, and gamelength
         const timestampSpan = document.createElement('span');
@@ -845,16 +846,7 @@ function displayProcessingOptions() {
     // }
 }
 
-// // Event listener for the sortProcessedFiles button
-// document.getElementById('sortProcessedFiles').addEventListener('click', () => {
-//     const fileOrderRadio = document.querySelector('input[name="fileOrder"]:checked');
-//     const fileOrder = fileOrderRadio ? fileOrderRadio.value : 'Descending';
-
-//     // Sort processed files based on the selected file order
-//     sortAndRearrangeCollapsibles(fileOrder);
-// });
-
-function sortAndRearrangeCollapsibles(order) {
+function sortAndRearrangeCollapsibles(option) {
     // Retrieve the container elements
     const collapsibleContainer = document.getElementById('collapsibleContainer');
     const tableContainer = document.getElementById('tableContainer');
@@ -865,21 +857,44 @@ function sortAndRearrangeCollapsibles(order) {
     // Convert NodeList to array for easier manipulation
     const collapsiblesArray = Array.from(collapsibles);
 
-    // Sort the arrays based on the order (Ascending or Descending)
-    if (order === 'Ascending') {
-        collapsiblesArray.sort((a, b) => {
-            const timestampA = Date.parse(a.getAttribute('data-timestamp'));
-            const timestampB = Date.parse(b.getAttribute('data-timestamp'));
-            return timestampA - timestampB;
-        });
-    } else {
-        collapsiblesArray.sort((a, b) => {
-            const timestampA = Date.parse(a.getAttribute('data-timestamp'));
-            const timestampB = Date.parse(b.getAttribute('data-timestamp'));
-            return timestampB - timestampA;
-        });
+    switch (option) {
+        case 'Ascending':
+            collapsiblesArray.sort((a, b) => {
+                const timestampA = Date.parse(a.getAttribute('data-timestamp'));
+                const timestampB = Date.parse(b.getAttribute('data-timestamp'));
+                return timestampA - timestampB;
+            });
+            break;
+    
+        case 'Descending':
+            collapsiblesArray.sort((a, b) => {
+                const timestampA = Date.parse(a.getAttribute('data-timestamp'));
+                const timestampB = Date.parse(b.getAttribute('data-timestamp'));
+                return timestampB - timestampA;
+            });
+            break;
+    
+        case 'Longest':
+            collapsiblesArray.sort((a, b) => {
+                const lengthA = parseInt(a.getAttribute('data-length'), 10);
+                const lengthB = parseInt(b.getAttribute('data-length'), 10);
+                return lengthB - lengthA;
+            });
+            break;
+    
+        case 'Shortest':
+            collapsiblesArray.sort((a, b) => {
+                const lengthA = parseInt(a.getAttribute('data-length'), 10);
+                const lengthB = parseInt(b.getAttribute('data-length'), 10);
+                return lengthA - lengthB;
+            });
+            break;
+    
+        default:
+            console.warn('Unknown sorting option:', option);
+            break;
     }
-
+    
     // Clear the container elements
     collapsibleContainer.innerHTML = '';
     tableContainer.innerHTML = '';
@@ -960,6 +975,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('leastRecentOption').addEventListener('click', function() {
         sortAndRearrangeCollapsibles('Ascending');
+        document.getElementById('sortDropdown').classList.remove('show');
+    });
+
+    document.getElementById('longestOption').addEventListener('click', function() {
+        sortAndRearrangeCollapsibles('Longest');
+        document.getElementById('sortDropdown').classList.remove('show');
+    });
+
+    document.getElementById('shortestOption').addEventListener('click', function() {
+        sortAndRearrangeCollapsibles('Shortest');
         document.getElementById('sortDropdown').classList.remove('show');
     });
 

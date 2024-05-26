@@ -11,10 +11,11 @@
     margin-right: 5px;
     font-weight: bold;
     background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
-                linear-gradient(to bottom, #F15959, #F15959);
+                linear-gradient(to bottom, rgb(187, 69, 69), rgb(187, 69, 69));
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    text-shadow: 0 0 3px rgb(0, 0, 0); 
+    text-shadow: 0 0 3px rgb(0, 0, 0);
+    box-shadow: 0 0 0 2px #F15959;
 }
 
 .team-red-winner {
@@ -33,10 +34,11 @@
     margin-right: 5px;
     font-weight: bold;
     background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
-                linear-gradient(to bottom, #6565FE, #6565FE);
+                linear-gradient(to bottom, #4848b6, #4848b6);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     text-shadow: 0 0 3px rgb(0, 0, 0);
+    box-shadow: 0 0 0 2px #6565FE;
 }
 
 .team-blu-winner {
@@ -55,10 +57,11 @@
     margin-right: 5px;
     font-weight: bold;
     background: radial-gradient(circle at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-                linear-gradient(to bottom, #4CE44C, #4CE44C);
+                linear-gradient(to bottom, #44ca44, #44ca44);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     text-shadow: 0 0 3px rgb(0, 0, 0);
+    box-shadow: 0 0 0 2px #4CE44C;
 }
 
 .team-grn-winner {
