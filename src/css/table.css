@@ -45,7 +45,8 @@ th {
 }
 
 .game-info-container {
-    display: block;
+    display: flex;
+    align-items: center;
     margin-top: 10px;
 }
 
@@ -53,11 +54,14 @@ th {
     width: 18px;
     height: 18px;
     margin-right: 5px;
-    transform: translateY(4px);
 }
 
 .game-info-container span { 
     margin-right: 20px;
+}
+
+.flex-spacer {
+    flex-grow: 1;
 }
 
 .collapsible {

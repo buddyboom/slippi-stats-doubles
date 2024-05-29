@@ -141,6 +141,7 @@ input[type=number]::-webkit-outer-spin-button {
 .header-container {
     display: flex;
     flex-direction: column;
+    width:100%;
 }
 
 .button-container {

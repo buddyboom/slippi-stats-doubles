@@ -110,7 +110,7 @@
 
         </div>
         <div class="calendar-selectors">
-            <label for="startDate">File Date Range (Optional):</label>
+            <label for="startDate">File Date Range <span style="color: #adadad"> - Optional</span></label>
             <div class="date-range-container">
                 <input type="date" id="startDate" name="startDate">
                 <span>-</span>
@@ -141,12 +141,14 @@
     <div id="about-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>made by <span><a href="https://twitter.com/buddyboom_" target="_blank" style="color: #1DA1F2;" id="twitter-link">buddyboom</a> <img src="../images/twitter.png" alt="Twitter icon" style="width: 24px; height: 24px;"></span> </h2>
+            <h1 style="text-align: center"><a href="https://github.com/buddyboom/slippi-stats-doubles" target="_blank" class="external-link" style="color:#F15959;">Doubles Stats for Slippi</a></h1>
+            
+            <h2>made by <span><a href="https://twitter.com/buddyboom_" target="_blank" class="external-link" style="color: #1DA1F2;" id="twitter-link">buddyboom</a> <img src="../images/twitter.png" alt="Twitter icon" style="width: 24px; height: 24px;"></span> </h2>
             <p><img src="../images/buddyboom.png" alt="buddyboom profile pic" style="max-width: 200px; max-height: 200px"></p>
 
             <div class="button-container">
                 <button class="startButton" id="startButton" onclick="return false;">Process Files</button>
-                <span class="button-description">Computes stats for all files in your chosen folder. Searches subfolders. Does not clear screen of previously processed files.</span>
+                <span class="button-description">Computes stats for all files in your chosen folder. Searches subfolders.</span>
             </div>
     
             <div class="button-container">
@@ -170,8 +172,13 @@
                 <span style="display: block; margin-left: 20px; font-size: smaller;" >If you LRAS after a disconnect, it'll show up as you.</span>
             </p>
 
-            <h3><a href="https://github.com/project-slippi/slippi-js/tree/feat/doubles" target="_blank" style="color: #1DA1F2;">slippi-js feat/doubles</a></h3>
+            <h3><a href="https://github.com/project-slippi/slippi-js/tree/feat/doubles" target="_blank" class="external-link" style="color: #1DA1F2;">slippi-js feat/doubles</a></h3>
             <p>This app uses a very old (May 23, 2021) version of .slp parsing that is compatible with doubles. Stats may not be 100% accurate.</p>
+            <h3 style="display: inline;">
+                <a href="https://slippi.gg/downloads" target="_blank" class="external-link" style="color:#4CAF50">Slippi Launcher</a>
+            </h3>
+            <h4 style="display: inline;"> - download the official Slippi Launcher for Singles stats.</h4>            
+            
         </div>
     </div>
 

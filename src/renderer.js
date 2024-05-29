@@ -4,7 +4,8 @@ const { join } = require('path');
 const { SlippiGame } = require('@slippi/slippi-js');
 const { characters, stages } = require('@slippi/slippi-js');
 const { dialog } = require('electron');
-const path = require('path')
+const path = require('path');
+const { shell } = require('electron');
 
 const TeamColors = {
     0: "RED",
@@ -125,7 +126,7 @@ function findFilesInDir(startPath, filter, fileOrder) {
     return results;
 }
 
-function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts) {
+function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts, fileName) {
     if (metadata && settings) {
         const collapsibleDiv = document.createElement('div');
         collapsibleDiv.classList.add('collapsible');
@@ -163,17 +164,19 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
 
             if (gameEnd != null) { // null === game crashed
                 switch (gameEnd.gameEndMethod) {
-                    case 3:
+                    case 3: // GAME! team battle
                         if (teamColorClass === ("team-" + winningTeamColor)) {
                             teamColorClass += '-winner';
                         }
                         break;
-                    case 7:
+                    case 7: // No Contest
                         if (isLRASInitiator(gameEnd, index)) {
                             teamColorClass += '-faded'; // Add 'faded' class if the player is the LRAS initiator
                         }
                         break;
                     default:
+                        // case 2: GAME! free for all (I think)
+                        // case ?: timeout
                         console.log(metadata.startAt + " Unknown gameEnd.gameEndMethod: " + gameEnd.gameEndMethod);
                         break;
                 }
@@ -223,6 +226,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         const gamelength = calculateGameLength(latestFrame);
         const gamelengthSeconds = parseGameLength(gamelength);
         const gamelengthPercentage = (gamelengthSeconds / (8 * 60)) * 100; // Calculate percentage of game length out of 8 minutes
+        const timerIcon = createTimerIcon(gamelengthPercentage);
         headerDiv.setAttribute('data-length', gamelengthSeconds); // to sort by shortest/longest in sortDropdown
 
         // Create elements for timestamp, stage, and gamelength
@@ -238,22 +242,30 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         gamelengthSpan.textContent = gamelength;
         gamelengthSpan.classList.add('small-text');
 
-        const timerIcon = createTimerIcon(gamelengthPercentage);
+        const fileNameSpan = document.createElement('span');
+        fileNameSpan.textContent = fileName;
+        fileNameSpan.classList.add('small-text');
+        fileNameSpan.style.marginRight = '5px';
 
-        // Create a container for player info
+        const flexSpacer = document.createElement('div');
+        flexSpacer.classList.add('flex-spacer');
+
         const playerInfoContainer = document.createElement('div');
         playerInfoContainer.classList.add('player-info-container');
         connectCodes.forEach(connectCodeSpan => {
             playerInfoContainer.appendChild(connectCodeSpan);
         });
 
-        // Create a container for timestamp, stage, and gamelength
         const gameInfoContainer = document.createElement('div');
         gameInfoContainer.classList.add('game-info-container');
         gameInfoContainer.appendChild(timestampSpan);
         gameInfoContainer.appendChild(timerIcon);
         gameInfoContainer.appendChild(gamelengthSpan);
         gameInfoContainer.appendChild(stageSpan);
+        
+        gameInfoContainer.appendChild(flexSpacer); // push fileNameSpan to right
+
+        gameInfoContainer.appendChild(fileNameSpan);
 
         // Create a container for header content
         const headerContainer = document.createElement('div');
@@ -359,8 +371,11 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
         }
     });
 
+    const filePath = game.getFilePath();
+    const fileName = filePath.split('\\').pop(); // Assuming the path separator is '\' (backslash)
+
     // Create a collapsible container for this file's output
-    const collapsibleSection = createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts);
+    const collapsibleSection = createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts, fileName);
 
     // Check if collapsibleSection is not null or undefined
     if (collapsibleSection) {
@@ -372,8 +387,6 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
         const table = createTable();
 
         const labelRow = table.insertRow();
-        const filePath = game.getFilePath();
-        const fileName = filePath.split('\\').pop(); // Assuming the path separator is '\' (backslash)
         
         const emptyCell = labelRow.insertCell();
         emptyCell.textContent = fileName;
@@ -1014,6 +1027,15 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.style.overflow = ''; // Allow scrolling of the background content
             window.scrollTo(0, scrollPosition); // Restore scroll position
         }
+    });
+
+    const links = document.querySelectorAll('a.external-link');
+    links.forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const url = event.target.href;
+            shell.openExternal(url);
+        });
     });
 
     const twitterLink = document.getElementById('twitter-link');
