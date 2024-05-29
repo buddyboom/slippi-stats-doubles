@@ -63,6 +63,12 @@ function convertUTCtoLocalTime(utcString, timezone) {
     return formattedDate;
 }
 
+function truncateSeconds(timestamp) {
+    const [date, time, period] = timestamp.split(' ');
+    const [hours, minutes] = time.split(':');
+    return `${date} ${hours}:${minutes} ${period}`;
+}
+
 function createTable() {
     const table = document.createElement('table');
     table.classList.add('slp-table');
@@ -231,7 +237,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
 
         // Create elements for timestamp, stage, and gamelength
         const timestampSpan = document.createElement('span');
-        timestampSpan.textContent = timestamp;
+        timestampSpan.textContent = truncateSeconds(timestamp);
         timestampSpan.classList.add('small-text');
 
         const stageSpan = document.createElement('span');
