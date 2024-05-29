@@ -1,7 +1,7 @@
 {
   "name": "slippi-stats-doubles",
   "productName": "Doubles Stats for Slippi",
-  "version": "1.2.18",
+  "version": "1.2.19",
   "description": "Process Slippi doubles files in bulk",
   "main": "src/main.js",
   "scripts": {
