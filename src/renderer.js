@@ -132,7 +132,7 @@ function findFilesInDir(startPath, filter, fileOrder) {
     return results;
 }
 
-function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts, fileName) {
+function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts, filePath) {
     if (metadata && settings) {
         const collapsibleDiv = document.createElement('div');
         collapsibleDiv.classList.add('collapsible');
@@ -248,10 +248,9 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         gamelengthSpan.textContent = gamelength;
         gamelengthSpan.classList.add('small-text');
 
-        const fileNameSpan = document.createElement('span');
-        fileNameSpan.textContent = fileName;
-        fileNameSpan.classList.add('small-text');
-        fileNameSpan.style.marginRight = '5px';
+        const fileNameSpan = createFileNameSpan(filePath);
+
+        const playIcon = createPlayIcon(filePath);
 
         const flexSpacer = document.createElement('div');
         flexSpacer.classList.add('flex-spacer');
@@ -278,6 +277,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         headerContainer.classList.add('header-container');
         headerContainer.appendChild(playerInfoContainer);
         headerContainer.appendChild(gameInfoContainer);
+        headerContainer.appendChild(playIcon); 
 
         // Append header content to the headerDiv
         headerDiv.appendChild(headerContainer);
@@ -336,6 +336,42 @@ function createTimerIcon(gamelengthPercentage) {
     return timerIcon;
 }
 
+function createFileNameSpan(filePath) {
+    const fileName = filePath.split('\\').pop(); // Assuming the path separator is '\' (backslash)
+    const fileNameSpan = document.createElement('span');
+    fileNameSpan.textContent = fileName;
+    fileNameSpan.classList.add('small-text', 'file-name-span');
+    fileNameSpan.style.marginRight = '5px';
+
+    fileNameSpan.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent the event from propagating to the collapsible header
+        shell.showItemInFolder(filePath);
+    });
+
+    return fileNameSpan;
+}
+
+function createPlayIcon(filePath) {
+    const playIcon = document.createElement('div');
+        playIcon.classList.add('play-icon');
+
+    // Add click event to open the file
+    playIcon.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent the event from propagating to the collapsible header
+        shell.openPath(filePath)
+            .then(result => {
+                if (result) {
+                    console.error('Failed to open file:', result);
+                }
+            })
+            .catch(err => {
+                console.error('Error opening file:', err);
+            });
+    });
+
+    return playIcon;
+}
+
 function appendCollapsibleSection(section) {
     const container = document.getElementById('collapsibleContainer');
     container.appendChild(section);
@@ -351,6 +387,13 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
     }
 
     const metadata = game.getMetadata();
+
+    // check game is completed
+    if(metadata === null) {
+        console.log(`'${gameFile}': metadata.startAt === null; game not completed or otherwise invalid.`);
+        return 'skipped';
+    }
+
     // dates compared in UTC
     const fileStartDate = convertUTCtoLocalTime(metadata.startAt, 'CT');
     const datePart = fileStartDate.split(' ')[0]; // Split at the space and get the first part
@@ -381,7 +424,7 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
     const fileName = filePath.split('\\').pop(); // Assuming the path separator is '\' (backslash)
 
     // Create a collapsible container for this file's output
-    const collapsibleSection = createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts, fileName);
+    const collapsibleSection = createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts, filePath);
 
     // Check if collapsibleSection is not null or undefined
     if (collapsibleSection) {
@@ -625,12 +668,33 @@ function addPlayerData(table, label, data, settings) {
             break;
     }
     
-
     // Apply alternating row shades
     const rowIndex = Array.from(table.rows).indexOf(row);
     const isEvenRow = rowIndex % 2 === 0;
     row.classList.add(isEvenRow ? 'table-row-even' : 'table-row-odd');
 }
+
+// document.getElementById('setPlaybackButton').addEventListener('click', function() {
+//     // Trigger the hidden file input click
+//     document.getElementById('fileInput').click();
+// });
+
+// document.getElementById('fileInput').addEventListener('change', function(event) {
+//     // Get the selected file
+//     const file = event.target.files[0];
+//     if (file) {
+//         // Store the file path for later use
+//         localStorage.setItem('selectedExePath', file.path); // You might need to adjust this line based on your environment
+//         alert(`Selected file: ${file.name}`);
+//     } else {
+//         alert('No file selected');
+//     }
+// });
+
+// // Function to get the stored file path (for later use)
+// function getStoredExePath() {
+//     return localStorage.getItem('selectedExePath');
+// }
 
 function saveSelectedFolderToLocalStorage(folderPath) {
     if (folderPath === null) {

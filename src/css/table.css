@@ -86,6 +86,70 @@ th {
     pointer-events: none; /* Disable pointer events on child elements, makes whole header clickable */
 }
 
+.play-icon {
+    pointer-events: auto;
+    width: 24px;
+    height: 24px;
+    background-color: #4CAF50; /* Green circle */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: 10px;
+    position: absolute;
+    right: 5px;
+    top: 35%;
+    transform: translateY(-50%);
+    transition: filter 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+
+.play-icon::before {
+    pointer-events: auto;
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 8px solid white; /* White play button */
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+}
+
+.play-icon:hover {
+    filter: brightness(1.2); /* Increase brightness */
+}
+
+.play-icon:active {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); /* Scale down and apply inset shadow */
+}
+
+.file-name-span {
+    pointer-events: auto; /* needed, to be clickable */
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.file-name-span::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1px; /* Adjust the height of the underline */
+    background: currentColor; /* Use the text color */
+    left: 0;
+    bottom: -1px; /* Adjust to position the underline properly */
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.file-name-span:hover::after {
+    opacity: 1;
+}
+
+.file-name-span:active {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); /* Scale down and apply inset shadow */
+}
+
 .stage-image {
     position: absolute;
     top: 0;
