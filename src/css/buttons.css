@@ -270,6 +270,42 @@ button:hover {
     transition: background-color 0.3s ease;
 }
 
+#scrollToTopBtn {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none; /* Hidden by default */
+    background-color: #444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    z-index: 1000; /* Ensure it stays on top */
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+    overflow: hidden; /* Ensure the ripple effect stays within the button */
+}
+
+#scrollToTopBtn .icon {
+    font-size: 20px;
+    color: white;
+    padding-left: 8px;
+}
+
+#scrollToTopBtn:hover {
+    background-color: #555;
+}
+
+#scrollToTopBtn.show {
+    display: flex;
+    opacity: 1; /* Show the button with transition */
+}
+
+#scrollToTopBtn:active {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
 /* Close button */
 .close {
     color: #aaa;

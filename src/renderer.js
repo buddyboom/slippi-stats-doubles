@@ -991,9 +991,26 @@ function handleBlur() {
     }
 }
 
-// Initialize event listeners on document ready
-document.addEventListener('DOMContentLoaded', initializeConnectCodeInput);
+function initializeScrollToTopBtn() {
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
 
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
+        }
+    });
+
+    scrollToTopBtn.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Add ripple effect by toggling the active class
+        scrollToTopBtn.classList.add('active');
+        setTimeout(() => {
+            scrollToTopBtn.classList.remove('active');
+        }, 600); // Match the duration of the ripple animation
+    });
+}
 
 document.getElementById('expandCollapseButton').addEventListener('click', function() {
     const collapsibleBodies = document.querySelectorAll('.collapsible-body');
@@ -1172,6 +1189,9 @@ document.addEventListener('DOMContentLoaded', function() {
         sortAndRearrangeCollapsibles('Shortest');
         document.getElementById('sortDropdown').classList.remove('show');
     });
+
+    initializeConnectCodeInput();
+    initializeScrollToTopBtn();
 
     const aboutModal = document.getElementById('about-modal');
     const closeButton = document.querySelector('.close');
