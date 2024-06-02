@@ -144,13 +144,74 @@ button:hover {
     color: #000;
     border: 1px solid #000;
     padding: 8px 16px;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
     z-index: 999;
 }
 
 #expandCollapseButton:hover {
     background-color: #ffffff;
+}
+
+#connectCodeContainer {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
+    cursor: text;
+    overflow:hidden;
+}
+
+#connectCodeContainer.hovered {
+    width: 100px;
+    height: 40px;
+    border-radius: 20px;
+}
+
+#connectCodeInput {
+    width: 0;
+    height: 30px;
+    border: none;
+    outline: none;
+    padding: 0 5px;
+    font-size: 14px;
+    transition: width 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    background-color: #444;
+    color: white;
+    border-radius: 5px;
+}
+
+#connectCodeContainer.hovered #connectCodeInput {
+    width: 80px;
+    opacity: 1;
+}
+
+.icon {
+    font-size: 20px;
+    color: yellow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    line-height: 1;
+    padding-right: 8px;
+}
+
+#connectCodeContainer.hovered .icon {
+    display: none;
+}
+
+#connectCodeContainer.hovered {
+    background-color: #444;
 }
 
 .dropbtn {

@@ -222,7 +222,15 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
             playerInfoSpan.appendChild(characterIconImg);
             playerInfoSpan.appendChild(connectCodeSpan);
 
-            return playerInfoSpan;
+            return {playerInfoSpan, connectCode};
+        });
+
+        // Add connect codes to the collapsible header as a data attribute
+        headerDiv.dataset.connectCodes = JSON.stringify(connectCodes.map(info => info.connectCode));
+
+        // Append player info spans to the header
+        connectCodes.forEach(info => {
+            headerDiv.appendChild(info.playerInfoSpan);
         });
 
         const timestamp = convertUTCtoLocalTime(metadata.startAt, 'CT');
@@ -257,8 +265,8 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
 
         const playerInfoContainer = document.createElement('div');
         playerInfoContainer.classList.add('player-info-container');
-        connectCodes.forEach(connectCodeSpan => {
-            playerInfoContainer.appendChild(connectCodeSpan);
+        connectCodes.forEach(info => {
+            playerInfoContainer.appendChild(info.playerInfoSpan);
         });
 
         const gameInfoContainer = document.createElement('div');
@@ -285,9 +293,6 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         const bodyDiv = document.createElement('div');
         bodyDiv.classList.add('collapsible-body');
 
-        const table = createTable();
-        bodyDiv.appendChild(table);
-
         collapsibleDiv.appendChild(headerDiv);
         collapsibleDiv.appendChild(bodyDiv);
 
@@ -297,6 +302,63 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
     }
 }
 
+// Function to handle input and highlight matching columns
+document.getElementById('connectCodeInput').addEventListener('input', function() {
+    const input = this.value.trim().toUpperCase();
+
+    const collapsibleSections = document.querySelectorAll('.collapsible');
+
+    collapsibleSections.forEach((section, sectionIndex) => {
+
+        const header = section.querySelector('.collapsible-header');
+        const body = section.querySelector('.collapsible-body');
+        const table = body ? body.querySelector('.slp-table') : null;
+
+        if (!header || !body || !table) {
+            console.log('Skipping section due to missing elements. Header:', !!header, 'Body:', !!body, 'Table:', !!table);
+            return; // Skip this section if any of the required elements are missing
+        }
+
+        const connectCodes = JSON.parse(header.dataset.connectCodes);
+
+        // Reset previous highlights
+        const cells = table.querySelectorAll('td, th');
+        cells.forEach(cell => {
+            cell.classList.remove('highlight');
+        });
+
+        // Check for match and highlight column if found
+        if (connectCodes.includes(input)) {
+            console.log('Match found for input:', input);
+            const columnIndex = connectCodes.indexOf(input) + 1; // +1 to account for table headers
+
+            // Try different ways to select rows
+            const tbody = table.querySelector('tbody');
+            if (!tbody) {
+                console.log('No tbody found in the table.');
+                return;
+            }
+
+            const rows = tbody.querySelectorAll('tr');
+
+            rows.forEach((row, rowIndex) => {
+                // Ensure there are enough cells in the row to access the desired column
+                if (row.children.length > columnIndex) {
+                    const cell = row.children[columnIndex];
+                    if (cell) {
+                        cell.classList.add('highlight');
+                    } else {
+                        console.log(`No cell found in row ${rowIndex} at column ${columnIndex}`);
+                    }
+                } else {
+                    console.log(`Row ${rowIndex} does not have a column ${columnIndex}`);
+                }
+            });
+        } else {
+            console.log('No match found for input:', input);
+        }
+    });
+});
 function parseGameLength(gamelength) {
     const [minutes, seconds] = gamelength.split('m');
     return parseInt(minutes) * 60 + parseInt(seconds.replace('s', ''));
@@ -892,6 +954,46 @@ document.addEventListener('click', function(event) {
         collapsibleBody.classList.toggle('show');
     }
 });
+
+function initializeConnectCodeInput() {
+    const connectCodeContainer = document.getElementById('connectCodeContainer');
+    const connectCodeInput = document.getElementById('connectCodeInput');
+
+    connectCodeContainer.addEventListener('mouseenter', handleMouseEnter);
+    connectCodeContainer.addEventListener('mouseleave', handleMouseLeave);
+    connectCodeInput.addEventListener('focus', handleFocus);
+    connectCodeInput.addEventListener('blur', handleBlur);
+}
+
+function handleMouseEnter() {
+    const connectCodeContainer = document.getElementById('connectCodeContainer');
+    connectCodeContainer.classList.add('hovered');
+}
+
+function handleMouseLeave() {
+    const connectCodeContainer = document.getElementById('connectCodeContainer');
+    const connectCodeInput = document.getElementById('connectCodeInput');
+    if (!connectCodeInput.value && !connectCodeInput.matches(':focus')) { // Collapse back only if input is empty and not focused
+        connectCodeContainer.classList.remove('hovered');
+    }
+}
+
+function handleFocus() {
+    const connectCodeContainer = document.getElementById('connectCodeContainer');
+    connectCodeContainer.classList.add('hovered');
+}
+
+function handleBlur() {
+    const connectCodeContainer = document.getElementById('connectCodeContainer');
+    const connectCodeInput = document.getElementById('connectCodeInput');
+    if (!connectCodeInput.value && !connectCodeContainer.matches(':hover')) { // Collapse back only if input is empty and container is not hovered
+        connectCodeContainer.classList.remove('hovered');
+    }
+}
+
+// Initialize event listeners on document ready
+document.addEventListener('DOMContentLoaded', initializeConnectCodeInput);
+
 
 document.getElementById('expandCollapseButton').addEventListener('click', function() {
     const collapsibleBodies = document.querySelectorAll('.collapsible-body');
