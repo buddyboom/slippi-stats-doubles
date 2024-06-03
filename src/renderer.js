@@ -303,13 +303,12 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
 }
 
 // Function to handle input and highlight matching columns
-document.getElementById('connectCodeInput').addEventListener('input', function() {
-    const input = this.value.trim().toUpperCase();
+function highlightMatchingColumns() {
+    const input = document.getElementById('connectCodeInput').value.trim().toUpperCase();
 
     const collapsibleSections = document.querySelectorAll('.collapsible');
 
     collapsibleSections.forEach((section, sectionIndex) => {
-
         const header = section.querySelector('.collapsible-header');
         const body = section.querySelector('.collapsible-body');
         const table = body ? body.querySelector('.slp-table') : null;
@@ -358,7 +357,8 @@ document.getElementById('connectCodeInput').addEventListener('input', function()
             console.log('No match found for input:', input);
         }
     });
-});
+}
+
 function parseGameLength(gamelength) {
     const [minutes, seconds] = gamelength.split('m');
     return parseInt(minutes) * 60 + parseInt(seconds.replace('s', ''));
@@ -937,6 +937,8 @@ async function processFiles() {
     loadingBar.style.width = '100%';
     // Hide loading text and bar when done
     loadingText.style.display = 'none';
+
+    highlightMatchingColumns(); // check matches for highlighted text after processing new files
 }
 
 // Event listener for the start button
@@ -963,6 +965,7 @@ function initializeConnectCodeInput() {
     connectCodeContainer.addEventListener('mouseleave', handleMouseLeave);
     connectCodeInput.addEventListener('focus', handleFocus);
     connectCodeInput.addEventListener('blur', handleBlur);
+    connectCodeInput.addEventListener('input', highlightMatchingColumns); 
 }
 
 function handleMouseEnter() {
@@ -973,7 +976,7 @@ function handleMouseEnter() {
 function handleMouseLeave() {
     const connectCodeContainer = document.getElementById('connectCodeContainer');
     const connectCodeInput = document.getElementById('connectCodeInput');
-    if (!connectCodeInput.value && !connectCodeInput.matches(':focus')) { // Collapse back only if input is empty and not focused
+    if (!connectCodeInput.matches(':focus')) {
         connectCodeContainer.classList.remove('hovered');
     }
 }
@@ -985,8 +988,7 @@ function handleFocus() {
 
 function handleBlur() {
     const connectCodeContainer = document.getElementById('connectCodeContainer');
-    const connectCodeInput = document.getElementById('connectCodeInput');
-    if (!connectCodeInput.value && !connectCodeContainer.matches(':hover')) { // Collapse back only if input is empty and container is not hovered
+    if (!connectCodeContainer.matches(':hover')) {
         connectCodeContainer.classList.remove('hovered');
     }
 }

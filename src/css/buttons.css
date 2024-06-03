@@ -257,7 +257,7 @@ button:hover {
 
 .dropdown-content a {
     color: white;
-    padding: 10px 14px; /* Reduced padding */
+    padding: 10px 14px;
     text-decoration: none;
     display: block;
     background-color: #333; /* Dark background color */
@@ -275,12 +275,12 @@ button:hover {
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    display: none; /* Hidden by default */
+    display: none;
     background-color: #444;
     color: white;
-    border: none;
     border-radius: 50%;
-    padding: 6px;
+    padding: 4px;
+    border-color: #eee;
     cursor: pointer;
     z-index: 1000; /* Ensure it stays on top */
     transition: opacity 0.3s ease, background-color 0.3s ease;
@@ -289,7 +289,7 @@ button:hover {
 
 #scrollToTopBtn .icon {
     font-size: 20px;
-    color: white;
+    color: #eee;
     padding-left: 8px;
 }
 
