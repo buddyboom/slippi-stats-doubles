@@ -768,7 +768,7 @@ function saveSelectedFolderToLocalStorage(folderPath) {
 
 // Function to retrieve selected folder path from localStorage
 function getSelectedFolderFromLocalStorage() {
-    return localStorage.getItem('selectedFolder') || '(Select Folder)';
+    return localStorage.getItem('selectedFolder');
 }
 
 // Event listener for the open folder button
@@ -839,11 +839,9 @@ async function processFiles() {
     console.log("Selected folder: " + selectedFolder)
     if (!selectedFolder || selectedFolder === null || selectedFolder === "null") {
         console.log('Please select a folder first.');
-        alert('Choose a folder first. (Select Folder)');
+        createMessageErrorDirectory(document)
         return;
     }
-
-    showLoadingIcon(); 
 
     // Get the value of the file order radio buttons
     const fileOrderRadio = document.querySelector('input[name="fileOrder"]:checked');
@@ -867,14 +865,16 @@ async function processFiles() {
         if (!isNaN(customFileCount)) {
             totalFiles = Math.min(customFileCount, gameFiles.length);
         } else {
-            console.log('Invalid custom file count. Please enter a valid number.');
-            alert('Invalid custom file count. Please enter a valid number.');
+            console.log('Invalid custom file count: '+customFileCount);
+            createMessageInvalidCount(document)
             return;
         }
     } else {
         // Assume a specific number is selected
         totalFiles = parseInt(selectedFileCount);
     }
+
+    showLoadingIcon();
 
     // Show loading bar and text
     const loadingText = document.getElementById('loading-text');
@@ -922,23 +922,52 @@ async function processFiles() {
             }, 0);
         });
     }
-    const message = document.createElement('div');
-    message.classList.add('message');
-    message.textContent = filesProcessed + (filesProcessed === 1 ? ' file' : ' files') + ' processed.';
-    document.body.appendChild(message);
+
+    createMessageProcessed(filesProcessed, document);
 
     hideLoadingIcon();
-
-    // Remove the message after 5 seconds
-    setTimeout(() => {
-        document.body.removeChild(message);
-    }, 5000);
 
     loadingBar.style.width = '100%';
     // Hide loading text and bar when done
     loadingText.style.display = 'none';
 
     highlightMatchingColumns(); // check matches for highlighted text after processing new files
+}
+
+function createMessageErrorDirectory(document) {
+    const message = document.createElement('div');
+    message.classList.add('message');
+    message.textContent = 'No directory chosen. Use Select Folder button.'
+    document.body.appendChild(message);
+
+    // Remove the message after 5 seconds
+    setTimeout(() => {
+        document.body.removeChild(message);
+    }, 5000);
+}
+
+function createMessageInvalidCount(document) {
+    const message = document.createElement('div');
+    message.classList.add('message');
+    message.textContent = 'Invalid file count. Please enter a valid number.'
+    document.body.appendChild(message);
+
+    // Remove the message after 5 seconds
+    setTimeout(() => {
+        document.body.removeChild(message);
+    }, 5000);
+}
+
+function createMessageProcessed(filesProcessed, document) {
+    const message = document.createElement('div');
+    message.classList.add('message');
+    message.textContent = filesProcessed + (filesProcessed === 1 ? ' file' : ' files') + ' processed.';
+    document.body.appendChild(message);
+
+    // Remove the message after 5 seconds
+    setTimeout(() => {
+        document.body.removeChild(message);
+    }, 5000);
 }
 
 // Event listener for the start button
