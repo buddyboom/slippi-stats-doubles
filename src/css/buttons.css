@@ -270,6 +270,45 @@ button:hover {
     transition: background-color 0.3s ease;
 }
 
+.hide-short-games input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 18px;
+    height: 18px;
+    background-color: #ccc;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    position: relative;
+}
+
+.hide-short-games input[type="checkbox"]:checked {
+    background-color: #4CAF50;
+}
+
+.hide-short-games input[type="checkbox"]::before {
+    content: "\2705";
+    font-size: 19px;
+    color: white;
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    visibility: hidden;
+}
+
+.hide-short-games input[type="checkbox"]:hover:not(:checked) {
+    background-color: #999999;
+}
+
+.hide-short-games input[type="checkbox"]:checked::before {
+    visibility: visible;
+}
+
+.hide-short-games label {
+    white-space: nowrap;
+}
+
 #scrollToTopBtn {
     position: fixed;
     top: 10px;

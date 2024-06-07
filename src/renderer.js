@@ -241,7 +241,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         const gamelengthSeconds = parseGameLength(gamelength);
         const gamelengthPercentage = (gamelengthSeconds / (8 * 60)) * 100; // Calculate percentage of game length out of 8 minutes
         const timerIcon = createTimerIcon(gamelengthPercentage);
-        headerDiv.setAttribute('data-length', gamelengthSeconds); // to sort by shortest/longest in sortDropdown
+        headerDiv.setAttribute('data-gamelength', gamelengthSeconds); // to sort by shortest/longest in sortDropdown
 
         // Create elements for timestamp, stage, and gamelength
         const timestampSpan = document.createElement('span');
@@ -932,6 +932,7 @@ async function processFiles() {
     loadingText.style.display = 'none';
 
     highlightMatchingColumns(); // check matches for highlighted text after processing new files
+    hideShortGames(); // check short games to be hidden after processing
 }
 
 function createMessageErrorDirectory(document) {
@@ -1043,6 +1044,35 @@ function initializeScrollToTopBtn() {
     });
 }
 
+function initializeHideShortGamesCheckbox() {
+    const hideShortGamesCheckbox = document.getElementById('hideShortGamesCheckbox');
+    hideShortGamesCheckbox.addEventListener('change', function() {
+        hideShortGames();
+    });
+
+    // Initial call to apply the hiding logic based on the checkbox state
+    hideShortGames();
+}
+
+function hideShortGames() {
+    const hideShortGamesCheckbox = document.getElementById('hideShortGamesCheckbox');
+    const collapsibleSections = document.querySelectorAll('.collapsible');
+
+    collapsibleSections.forEach(section => {
+        const gameLength = parseFloat(section.querySelector('.collapsible-header').dataset.gamelength);
+
+        if (hideShortGamesCheckbox.checked) {
+            if (gameLength < 30) {
+                section.style.display = 'none';
+            } else {
+                section.style.display = '';
+            }
+        } else {
+            section.style.display = '';
+        }
+    });
+}
+
 document.getElementById('expandCollapseButton').addEventListener('click', function() {
     const collapsibleBodies = document.querySelectorAll('.collapsible-body');
     let allExpanded = true;
@@ -1109,16 +1139,16 @@ function sortAndRearrangeCollapsibles(option) {
     
         case 'Longest':
             collapsiblesArray.sort((a, b) => {
-                const lengthA = parseInt(a.getAttribute('data-length'), 10);
-                const lengthB = parseInt(b.getAttribute('data-length'), 10);
+                const lengthA = parseInt(a.getAttribute('data-gamelength'), 10);
+                const lengthB = parseInt(b.getAttribute('data-gamelength'), 10);
                 return lengthB - lengthA;
             });
             break;
     
         case 'Shortest':
             collapsiblesArray.sort((a, b) => {
-                const lengthA = parseInt(a.getAttribute('data-length'), 10);
-                const lengthB = parseInt(b.getAttribute('data-length'), 10);
+                const lengthA = parseInt(a.getAttribute('data-gamelength'), 10);
+                const lengthB = parseInt(b.getAttribute('data-gamelength'), 10);
                 return lengthA - lengthB;
             });
             break;
@@ -1223,6 +1253,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     initializeConnectCodeInput();
     initializeScrollToTopBtn();
+    initializeHideShortGamesCheckbox();
 
     const aboutModal = document.getElementById('about-modal');
     const closeButton = document.querySelector('.close');
