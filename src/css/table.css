@@ -15,6 +15,12 @@ table {
     color: #eee;
 }
 
+.slp-table {
+    max-width: 100%; /* Ensures the table does not exceed the width of its container */
+    width: 100%; /* Optional: makes the table take up the full width of its container */
+    table-layout: fixed; /* Makes sure the table respects the max-width */
+}
+
 th, td {
     border: 1px solid #555;
     text-align: left;
@@ -171,6 +177,7 @@ th {
     display: block; /* display collapsible body by default */
     padding: 10px;
     border-radius: 8px;
+    max-width: 1000px;
 }
 
 .collapsible-body.show {
