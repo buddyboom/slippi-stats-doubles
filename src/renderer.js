@@ -797,6 +797,7 @@ document.getElementById('selectFolderButton').addEventListener('click', () => {
 ipcRenderer.on('selected-directory', (event, folderPath) => {
     console.log('Selected directory:', folderPath);
     saveSelectedFolderToLocalStorage(folderPath);
+    updateSelectedFolderText(); // settings modal text update
 });
 
 const ProcessedFilesModule = (() => {
@@ -1073,6 +1074,39 @@ function hideShortGames() {
     });
 }
 
+function initializeSettingsModal() {
+    var modal = document.getElementById("settingsModal");
+    var btn = document.getElementById("settingsButton");
+    var span = document.getElementsByClassName("close")[0];
+
+    btn.onclick = function() {
+        modal.style.display = "block";
+        updateSelectedFolderText(); 
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+}
+
+function updateSelectedFolderText() {
+    var selectedFolder = getSelectedFolderFromLocalStorage(); // Replace with your function to get the selected folder
+    var selectedFolderText = document.getElementById("selectedFolderText");
+
+    if (selectedFolder && selectedFolder !== "null") {
+        selectedFolderText.textContent = "Selected folder: " + selectedFolder;
+    } else {
+        selectedFolderText.textContent = "Select a folder";
+    }
+}
+
 document.getElementById('expandCollapseButton').addEventListener('click', function() {
     const collapsibleBodies = document.querySelectorAll('.collapsible-body');
     let allExpanded = true;
@@ -1254,6 +1288,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeConnectCodeInput();
     initializeScrollToTopBtn();
     initializeHideShortGamesCheckbox();
+    initializeSettingsModal();
 
     const aboutModal = document.getElementById('about-modal');
     const closeButton = document.querySelector('.close');
