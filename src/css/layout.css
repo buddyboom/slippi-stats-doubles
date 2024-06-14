@@ -129,8 +129,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .calendar-selectors {
-    margin-top: 40px; /* Adjust margin as needed */
-    margin-right: 20px; /* Adjust margin as needed */
+    margin-top: 5px;
 }
 
 .date-range-container {
@@ -153,8 +152,7 @@ input[type=number]::-webkit-outer-spin-button {
 .ignore-singles {
     display: flex;
     align-items: center;
-    margin-left: 20px;
-    margin-top: 30px;
+    margin-top: 15px;
 }
 
 legend {
@@ -167,7 +165,6 @@ legend {
     position: relative;
     display: flex;
     min-width: 200px;
-    /* border: dashed black 1px; */
     border-radius: 10px;
     background-color: #000000;
     margin-top: 10px;
@@ -186,8 +183,18 @@ legend {
 
 .options-container {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between; 
+}
+
+.left-options .file-options {
+    display: flex;
+    gap: 20px;
+}
+
+.right-options {
+    display: flex;
+    gap: 20px;
 }
 
 fieldset {
@@ -213,6 +220,71 @@ fieldset:not(:last-child) {
 .option-order {
     display: flex;
     align-items: center;
+}
+
+.accordion {
+    width: 95vw;
+    margin: 0; /* Remove margin */
+    padding: 0; /* Remove padding */
+    border-bottom: 1px solid #ccc;
+}
+
+.accordion-header {
+    cursor: pointer;
+    font-size: 18px;
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.accordion-button {
+    background: none;
+    border: none;
+    font-size: inherit;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.accordion-arrow {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 15px;
+}
+
+.accordion-content p {
+    padding: 15px 0;
+    margin: 0;
+}
+
+/* Add this CSS to rotate the arrow */
+.accordion-header.active .accordion-arrow {
+    transform: rotate(180deg);
+}
+
+.file-options-advanced {
+    border: 1px solid #999;
+    padding: 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+.file-options-advanced legend {
+    font-size: 18px;
+    padding: 0 10px;
+    color: #ccc;
+    font-weight: bold;
 }
 
 #footer {

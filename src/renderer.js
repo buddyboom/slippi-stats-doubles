@@ -1290,6 +1290,19 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeHideShortGamesCheckbox();
     initializeSettingsModal();
 
+    const accordionHeader = document.getElementById("accordionHeader");
+    const accordionContent = document.getElementById("accordionContent");
+
+    accordionHeader.addEventListener("click", function () {
+        this.classList.toggle("active");
+
+        if (this.classList.contains("active")) {
+            accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
+        } else {
+            accordionContent.style.maxHeight = 0;
+        }
+    });
+
     const aboutModal = document.getElementById('about-modal');
     const closeButton = document.querySelector('.close');
 

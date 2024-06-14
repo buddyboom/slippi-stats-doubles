@@ -62,67 +62,82 @@
         <div style="height: 40px;"></div>
 
         <div class="options-container">
-            <div class="file-options">
-                <div class="option-count">
-                    <fieldset>
-                        <legend>File Count</legend>
-                        <div class="radio-block">
-                            <input type="radio" id="allFiles" name="fileCount" value="ALL" checked>
-                            <label for="allFiles">ALL</label>
-                            <input type="radio" id="customFiles" name="fileCount" value="CUSTOM">
-                            <label for="customFiles" class="off-label">Custom</label>
-                            <span class="selected" aria-hidden="true"></span>
-                        </div>
-                        <div class="custom-file-count">
-                            <button class="decrement-btn" style="display: none">-</button>
-                            <input type="number" id="customFileCount" style="display: none">
-                            <button class="increment-btn" style="display: none">+</button>
-                        </div>
-                    </fieldset>
-                </div>
-                <div class="option-order">
-                    <fieldset>
-                        <legend>File Order</legend>
-                        <div class="radio-block">
-                            <input type="radio" id="descending" name="fileOrder" value="Descending" checked>
-                            <label for="descending">Newest</label>
-                            <input type="radio" id="ascending" name="fileOrder" value="Ascending">
-                            <label for="ascending" class="off-label">Oldest</label>
-                            <span class="selected" aria-hidden="true"></span>
-                        </div>
-                    </fieldset>
-                </div>
-                <div class="ignore-singles">
-                    <input type="checkbox" id="ignoreSingles" name="ignoreSingles" checked>
-                    <label for="ignoreSingles">Ignore singles games</label>
+            <div class="left-options">
+                <div class="file-options">
+                    <div class="option-count">
+                        <fieldset>
+                            <legend>File Count</legend>
+                            <div class="radio-block">
+                                <input type="radio" id="allFiles" name="fileCount" value="ALL" checked>
+                                <label for="allFiles">ALL</label>
+                                <input type="radio" id="customFiles" name="fileCount" value="CUSTOM">
+                                <label for="customFiles" class="off-label">Custom</label>
+                                <span class="selected" aria-hidden="true"></span>
+                            </div>
+                            <div class="custom-file-count">
+                                <button class="decrement-btn" style="display: none">-</button>
+                                <input type="number" id="customFileCount" style="display: none">
+                                <button class="increment-btn" style="display: none">+</button>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="option-order">
+                        <fieldset>
+                            <legend>File Order</legend>
+                            <div class="radio-block">
+                                <input type="radio" id="descending" name="fileOrder" value="Descending" checked>
+                                <label for="descending">Newest</label>
+                                <input type="radio" id="ascending" name="fileOrder" value="Ascending">
+                                <label for="ascending" class="off-label">Oldest</label>
+                                <span class="selected" aria-hidden="true"></span>
+                            </div>
+                        </fieldset>
+                    </div>
                 </div>
             </div>
             <!-- <button id="sortProcessedFiles">Sort Processed Files</button> -->
-            <div class="dropdown">
-                <button class="dropbtn">Sort files</button>
-                <div id="sortDropdown" class="dropdown-content">
-                    <a href="#" id="mostRecentOption">Newest first</a>
-                    <a href="#" id="leastRecentOption">Oldest first</a>
-                    <a href="#" id="longestOption">Longest game</a>
-                    <a href="#" id="shortestOption">Shortest game</a>
+            <div class="right-options">
+                <div class="dropdown">
+                    <button class="dropbtn">Sort files</button>
+                    <div id="sortDropdown" class="dropdown-content">
+                        <a href="#" id="mostRecentOption">Newest first</a>
+                        <a href="#" id="leastRecentOption">Oldest first</a>
+                        <a href="#" id="longestOption">Longest game</a>
+                        <a href="#" id="shortestOption">Shortest game</a>
+                    </div>
+                </div>
+                <div class="hide-short-games">
+                    <input type="checkbox" id="hideShortGamesCheckbox" checked>
+                    <label for="hideShortGamesCheckbox">Hide short games</label>
+                </div>            
+            </div>
+        </div>
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header" id="accordionHeader">
+                    <button class="accordion-button">Advanced <span class="accordion-arrow">&#9660;</span></button>
+                </div>
+                <div class="accordion-content" id="accordionContent">
+                    <fieldset class="file-options-advanced">
+                        <legend>File Options - Advanced</legend>
+                        <div class="calendar-selectors">
+                            <label for="startDate">File Date Range <span style="color: #adadad"> - Optional</span></label>
+                            <div class="date-range-container">
+                                <input type="date" id="startDate" name="startDate">
+                                <span>-</span>
+                                <input type="date" id="endDate" name="endDate">
+                            </div>
+                            <p id="dateError" style="color: red; display: none;">End date must be on or after start date.</p>
+                        </div>
+                        <div class="ignore-singles">
+                            <input type="checkbox" id="ignoreSingles" name="ignoreSingles" checked>
+                            <label for="ignoreSingles">Ignore singles games</label>
+                        </div>
+                    </fieldset>
                 </div>
             </div>
-
-            <div class="hide-short-games">
-                <input type="checkbox" id="hideShortGamesCheckbox" checked>
-                <label for="hideShortGamesCheckbox">Hide short games</label>
-            </div>            
-
         </div>
-        <div class="calendar-selectors">
-            <label for="startDate">File Date Range <span style="color: #adadad"> - Optional</span></label>
-            <div class="date-range-container">
-                <input type="date" id="startDate" name="startDate">
-                <span>-</span>
-                <input type="date" id="endDate" name="endDate">
-            </div>
-            <p id="dateError" style="color: red; display: none;">End date must be on or after start date.</p>
-        </div>
+        
         
         <div id="settingsButtonContainer">
             <i id="settingsButton" class="fa fa-cog"></i>

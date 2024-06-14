@@ -116,7 +116,7 @@ button:hover {
     font-size: 19px;
     color: white; /* Color of the checkmark */
     position: absolute; /* Position absolute for positioning */
-    top: 45%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%); /* Center the checkmark */
     visibility: hidden; /* Hide the checkmark by default */
@@ -134,6 +134,7 @@ button:hover {
 .ignore-singles label {
     /* Display on a single line */
     white-space: nowrap;
+    width: 0%;
 }
 
 #expandCollapseButton {
@@ -270,6 +271,11 @@ button:hover {
     transition: background-color 0.3s ease;
 }
 
+.hide-short-games {
+    display: flex;
+    align-items: center;
+}
+
 .hide-short-games input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -280,15 +286,18 @@ button:hover {
     border: 1px solid #ccc;
     cursor: pointer;
     position: relative;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .hide-short-games input[type="checkbox"]:checked {
     background-color: #4CAF50;
+    border-color: #4CAF50; /* Ensure the border is consistent when checked */
 }
 
 .hide-short-games input[type="checkbox"]::before {
-    content: "\2705";
-    font-size: 19px;
+    content: "\2705"; /* Checkmark character */
+    font-size: 19px; /* Adjust font-size for better alignment */
     color: white;
     position: absolute;
     top: 45%;
