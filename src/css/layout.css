@@ -267,7 +267,7 @@ fieldset:not(:last-child) {
     margin: 0;
 }
 
-/* Add this CSS to rotate the arrow */
+/* rotate the arrow */
 .accordion-header.active .accordion-arrow {
     transform: rotate(180deg);
 }

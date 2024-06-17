@@ -318,6 +318,11 @@ function highlightMatchingColumns() {
             return; // Skip this section if any of the required elements are missing
         }
 
+        if(!input) {
+            console.log('highlightMatchingColumns: Input is blank');
+            return;
+        }
+
         const connectCodes = JSON.parse(header.dataset.connectCodes);
 
         // Reset previous highlights
@@ -1056,6 +1061,7 @@ function initializeHideShortGamesCheckbox() {
 }
 
 function hideShortGames() {
+    let numShortGames = 0;
     const hideShortGamesCheckbox = document.getElementById('hideShortGamesCheckbox');
     const collapsibleSections = document.querySelectorAll('.collapsible');
 
@@ -1065,6 +1071,7 @@ function hideShortGames() {
         if (hideShortGamesCheckbox.checked) {
             if (gameLength < 30) {
                 section.style.display = 'none';
+                numShortGames++;
             } else {
                 section.style.display = '';
             }
@@ -1072,6 +1079,7 @@ function hideShortGames() {
             section.style.display = '';
         }
     });
+    console.log('numShortGames '+numShortGames)
 }
 
 function initializeSettingsModal() {
