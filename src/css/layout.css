@@ -1,3 +1,7 @@
+html {
+    overflow-y: scroll; /* Always show vertical scrollbar */
+}
+
 body {
     background-color: #222;
     color: #eee;
