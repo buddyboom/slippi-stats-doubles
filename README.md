@@ -1,9 +1,12 @@
 # `slippi-stats-doubles`
 <img src="https://github.com/buddyboom/slippi-stats-doubles/assets/167653477/c1a5e07e-8e96-4cb5-8a24-a40dd96106c8" alt="slippi-stats-doubles-icon" width="200" height="200"/>
 
-Process stats of doubles files in bulk with Doubles Stats for Slippi. 
+![image](https://github.com/buddyboom/slippi-stats-doubles/assets/167653477/0feb4c4f-3b4f-4871-9107-04dde13f3d88)
 
-Please note that stats are not 100% accurate, as this project uses an old version of `slippi-js` that is compatible with doubles files.
+
+Process stats* of doubles files by using Doubles Stats for Slippi. 
+
+*Please note that stats are not 100% accurate, as this project uses an old version of `slippi-js` that is compatible with doubles files.
 
 ## Contribution
 If you are interested in contributing to this project, contact me on Discord.
