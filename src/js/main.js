@@ -6,7 +6,7 @@ app.on('ready', () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: path.join(__dirname, '../build', 'slippi-stats-doubles-icon.png'),
+    icon: path.join(__dirname, '../../build', 'slippi-stats-doubles-icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false

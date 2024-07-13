@@ -1,9 +1,9 @@
 {
   "name": "slippi-stats-doubles",
   "productName": "Doubles Stats for Slippi",
-  "version": "1.2.30",
+  "version": "1.2.31",
   "description": "Process Slippi doubles files in bulk",
-  "main": "src/main.js",
+  "main": "src/js/main.js",
   "scripts": {
     "start": "electron .",
     "build": "tsc --noEmit && dts build --target node",
