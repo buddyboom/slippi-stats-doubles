@@ -1,54 +1,49 @@
+/* Define custom properties for gradient colors */
+/* workaround for 'background' property gradient color transition */
+/* https://stackoverflow.com/a/63848864/14629408 */
+@property --redStart {
+    syntax: '<color>';
+    initial-value: #bb4545;
+    inherits: false;
+}
+
+@property --redEnd {
+    syntax: '<color>';
+    initial-value: #bb4545;
+    inherits: false;
+}
+
+@property --blueStart {
+    syntax: '<color>';
+    initial-value: #4848b6;
+    inherits: false;
+}
+
+@property --blueEnd {
+    syntax: '<color>';
+    initial-value: #4848b6;
+    inherits: false;
+}
+
+@property --greenStart {
+    syntax: '<color>';
+    initial-value: #44ca44;
+    inherits: false;
+}
+
+@property --greenEnd {
+    syntax: '<color>';
+    initial-value: #44ca44;
+    inherits: false;
+}
+
 /* header connect code text styling */
 .connect-code {
     text-shadow: 0 0 4px;
 }
 
-.team-red, .team-red-winner, .team-red-faded {
-    color: white;
-    padding: 5px 10px;
-    border-radius: 50px;
-    display: inline-block;
-    margin-right: 5px;
-    font-weight: bold;
-    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
-                linear-gradient(to bottom, rgb(187, 69, 69), rgb(187, 69, 69));
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    text-shadow: 0 0 3px rgb(0, 0, 0);
-    box-shadow: 0 0 0 2px #F15959;
-}
-
-.team-red-winner {
-    box-shadow: 0 0 0 3px gold;
-}
-
-.team-red-faded {
-    opacity: 0.5;
-}
-
-.team-blu, .team-blu-winner, .team-blu-faded {
-    color: white;
-    padding: 5px 10px;
-    border-radius: 50px;
-    display: inline-block;
-    margin-right: 5px;
-    font-weight: bold;
-    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
-                linear-gradient(to bottom, #4848b6, #4848b6);
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    text-shadow: 0 0 3px rgb(0, 0, 0);
-    box-shadow: 0 0 0 2px #6565FE;
-}
-
-.team-blu-winner {
-    box-shadow: 0 0 0 3px gold;
-}
-
-.team-blu-faded {
-    opacity: 0.5;
-}
-
+.team-red, .team-red-winner, .team-red-faded,
+.team-blu, .team-blu-winner, .team-blu-faded,
 .team-grn, .team-grn-winner, .team-grn-faded {
     color: white;
     padding: 5px 10px;
@@ -56,18 +51,61 @@
     display: inline-block;
     margin-right: 5px;
     font-weight: bold;
-    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-                linear-gradient(to bottom, #44ca44, #44ca44);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     text-shadow: 0 0 3px rgb(0, 0, 0);
+    pointer-events: auto; /* make clickable for user page link */
+    transition: transform 0.3s ease, 
+        --redStart 0.3s ease, --redEnd 0.3s ease,
+        --blueStart 0.3s ease, --blueEnd 0.3s ease,
+        --greenStart 0.3s ease, --greenEnd 0.3s ease;
+}
+
+.team-red, .team-red-winner, .team-red-faded {
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+        linear-gradient(to bottom, var(--redStart), var(--redEnd));
+    box-shadow: 0 0 0 2px #F15959;
+}
+
+.team-blu, .team-blu-winner, .team-blu-faded {
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+        linear-gradient(to bottom, var(--blueStart), var(--blueEnd));
+    box-shadow: 0 0 0 2px #6565FE;
+}
+
+.team-grn, .team-grn-winner, .team-grn-faded {
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+        linear-gradient(to bottom, var(--greenStart), var(--greenEnd));
     box-shadow: 0 0 0 2px #4CE44C;
 }
 
-.team-grn-winner {
+.team-red-winner, .team-blu-winner, .team-grn-winner {
     box-shadow: 0 0 0 3px gold;
 }
 
-.team-grn-faded {
+.team-red-faded, .team-blu-faded, .team-grn-faded {
     opacity: 0.5;
+}
+
+/* Hover state with lighter background colors */
+.team-red:hover, .team-red-winner:hover, .team-red-faded:hover {
+    --redStart: #ff6666;
+    --redEnd: #ff6666;
+}
+
+  .team-blu:hover, .team-blu-winner:hover, .team-blu-faded:hover {
+    --blueStart: #6565FE;
+    --blueEnd: #6565FE;
+}
+  
+  .team-grn:hover, .team-grn-winner:hover, .team-grn-faded:hover {
+    --greenStart: #66ff66;
+    --greenEnd: #66ff66;
+}
+
+/* Active (click) state */
+.team-red:active, .team-red-winner:active, .team-red-faded:active,
+.team-blu:active, .team-blu-winner:active, .team-blu-faded:active,
+.team-grn:active, .team-grn-winner:active, .team-grn-faded:active {
+    transform: scale(0.9);
 }

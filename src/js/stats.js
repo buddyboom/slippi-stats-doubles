@@ -167,7 +167,7 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
     const gameEnd = game.getGameEnd();
 
     const stockCounts = settings.players.map((player, index) => {
-        if (latestFrame.players[index] != null) {
+        if (latestFrame != null && latestFrame.players[index] != null) {
             return latestFrame.players[index].post.stocksRemaining;
         } else {
             return 0;

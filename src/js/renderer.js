@@ -426,13 +426,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    const links = document.querySelectorAll('a.external-link');
-    links.forEach(link => {
-        link.addEventListener('click', (event) => {
-            event.preventDefault();
-            const url = event.target.href;
-            shell.openExternal(url);
-        });
+    // Event delegation to handle dynamically created external links
+    document.addEventListener('click', (event) => {
+        // Check if the clicked element is within an anchor tag with class 'external-link'
+        let targetElement = event.target;
+
+        while (targetElement && targetElement !== document) {
+            if (targetElement.tagName === 'A' && targetElement.classList.contains('external-link')) {
+                event.preventDefault();
+                const url = targetElement.href;
+                shell.openExternal(url);
+                break;
+            }
+            targetElement = targetElement.parentElement;
+        }
     });
 
     const twitterLink = document.getElementById('twitter-link');

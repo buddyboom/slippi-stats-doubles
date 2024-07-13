@@ -67,6 +67,12 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
             characterIconImg.src = characterIconPath;
             characterIconImg.classList.add('character-icon');
 
+            // Create an anchor element for the connect code
+            const connectCodeLink = document.createElement('a');
+            connectCodeLink.href = `https://slippi.gg/user/${connectCode.replace('#', '-')}`;
+            connectCodeLink.target = '_blank'; // Open in new tab
+            connectCodeLink.classList.add('external-link');
+
             // Create a span for the connect code
             const connectCodeSpan = document.createElement('span');
             connectCodeSpan.classList.add('connect-code', teamColorClass);
@@ -86,10 +92,13 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
             connectCodeSpan.appendChild(prefixSpan);
             connectCodeSpan.appendChild(suffixSpan);
 
+            // Append the connect code span to the anchor
+            connectCodeLink.appendChild(connectCodeSpan);
+
             // Concatenate the character icon and connect code
             const playerInfoSpan = document.createElement('span');
             playerInfoSpan.appendChild(characterIconImg);
-            playerInfoSpan.appendChild(connectCodeSpan);
+            playerInfoSpan.appendChild(connectCodeLink);
 
             return {playerInfoSpan, connectCode};
         });
@@ -310,14 +319,17 @@ function appendCollapsibleSection(section) {
 }
 
 function calculateGameLength(latestFrame) {
-    let totalFrames = latestFrame.frame;
-    totalFrames += 120 // add two seconds for Ready Go
-    const totalSeconds = totalFrames / 60;
+    if(latestFrame != null) {
+        let totalFrames = latestFrame.frame;
+        totalFrames += 120 // add two seconds for Ready Go
+        const totalSeconds = totalFrames / 60;
 
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = Math.floor(totalSeconds % 60);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = Math.floor(totalSeconds % 60);
 
-    return `${minutes}m${seconds}s`;
+        return `${minutes}m${seconds}s`;
+    }
+    return '0m0s';
 }
 
 function parseGameLength(gamelength) {
