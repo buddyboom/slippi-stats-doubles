@@ -69,11 +69,11 @@ function findFilesInDir(startPath, filter, fileOrder) {
             results = results.concat(findFilesInDir(filename, filter, fileOrder)); //recurse
         }
         else if (filename.indexOf(filter) >= 0) {
-            console.log('-- found: ',filename);
+            // console.log('-- found: ',filename);
             results.push(filename);
         }
     }
-    
+    console.log("# files found: "+results.length);
     return results;
 }
 

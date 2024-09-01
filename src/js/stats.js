@@ -229,18 +229,22 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
         addPlayerData(table, 'L-Cancel %', stats.actionCounts.map(actionCounts => {
             const successCount = actionCounts.lCancelCount.success;
             const totalCount = successCount + actionCounts.lCancelCount.fail;
+
+            if (totalCount === 0) {
+                return '0% (0 / 0)';
+            }
+
             return `${Math.round((successCount / totalCount) * 100)}% (${successCount} / ${totalCount})`;
         }), settings);
         addPlayerData(table, 'Team Color', settings.players.map(player => TeamColors[player.teamId].toString()));
 
         appendTable(table);
 
-        console.log(fileName + " " + stages.getStageName(settings.stageId));
+        console.log(fileName + " " + stages.getStageName(settings.stageId) + " processing start");
         // if(gameEnd != null) {
         //     console.log('LRAS: '+ (parseInt(gameEnd.lrasInitiatorIndex)+ 1))
         //     console.log("gameEnd.gameEndMethod: "+gameEnd.gameEndMethod);    
         // }
-        console.log("---");
     
         // Append the table to the collapsible body
         collapsibleBody.appendChild(table);
@@ -415,7 +419,12 @@ function addPlayerData(table, label, data, settings) {
     
             lcancelsPercentages.forEach((percentage, index) => {
                 const teamColor = teamColors[index];
-                const gradientWidth = percentage;
+                if (percentage === '0%') {
+                    gradientWidth = '0%'; // Handle the zero attempts case
+                } else {
+                    gradientWidth = percentage;
+                }
+
                 const gradientColor = `rgba(${parseInt(teamColor.substring(1, 3), 16)}, ${parseInt(teamColor.substring(3, 5), 16)}, ${parseInt(teamColor.substring(5, 7), 16)}, 0.3)`;
                 valueCells[index].style.background = `linear-gradient(to right, ${gradientColor} ${gradientWidth}, transparent ${gradientWidth})`;
             });
