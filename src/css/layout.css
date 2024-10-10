@@ -34,7 +34,7 @@ body {
 
 label {
     position: relative;
-    z-index: 100;
+    z-index: 1;
     width: 50%;
     padding: 10px;
     transition: color 0.2s;

@@ -1,0 +1,165 @@
+.modal-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+.session-modal {
+    background: #111;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    /* max-width: 950px; */
+    max-height: 90vh;
+    overflow-y: auto;
+    border: solid;
+    border-color: #555;
+}
+
+.session-modal h1 {
+    text-align: center;
+    outline: double;
+}
+
+.session-modal h2 {
+    text-align: center;
+    border-top: solid;
+}
+
+.session-modal h3 {
+    text-align: center;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.close-button {
+    cursor: pointer;
+    padding: 10px;
+}
+
+.overall-record-info {
+    margin-bottom: 10px; /* Adjust the margin to create separation */
+}
+
+.percentage-bar {
+    display: flex;
+    width: 100%;
+    height: 20px; /* Adjust the height as needed */
+    margin-top: 5px;
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.overall-record-info span {
+    text-align: center;
+    margin-top: 3px;
+    color: white;
+}
+
+.record-and-teams {
+    display: flex;
+    justify-content: center; /* Ensure teams and record are spaced correctly */
+    align-items: center;            /* Vertically center align items */
+    margin-top: 2px;
+}
+
+/* .record-and-teams span {
+    padding-right: 5px;
+} */
+
+.record-text {
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+.stage-info-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+/* Additional styling for stage records
+.stage-info-container .stage-info {
+    margin-bottom: 20px;
+} */
+
+/* .stage-info-container h3 {
+    margin-top: 0;
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+} */
+
+.stage-info {
+    position: sticky;
+    overflow: hidden;
+    padding-bottom: 15px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.stage-info h3 {
+    margin-top: 0;
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    text-shadow: -1px -1px 0 #000,  
+    1px -1px 0 #000,
+   -1px  1px 0 #000,
+    1px  1px 0 #000;
+    text-decoration: underline;
+}
+
+.team-stage-info {
+    margin-bottom: 10px;
+}
+
+.combination-title {
+    align-items: center;
+    padding-top: 10px;
+}
+
+.character-combination-records-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.combination-record {
+    /* margin-bottom: 10px; */
+}
+
+.combination-record .record-and-teams .record-text {
+    margin-top: 10px;
+    margin-left: 5px;
+}
+
+.stage-character-records-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.tooltip {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 16px;
+    z-index: 3;
+}

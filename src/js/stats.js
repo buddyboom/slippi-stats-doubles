@@ -2,32 +2,7 @@ const { SlippiGame } = require('@slippi/slippi-js');
 const { TeamColors } = require('./constants.js');
 const { createCollapsibleSection, appendCollapsibleSection } = require('./collapsible.js');
 const { getSelectedFolderFromLocalStorage, findFilesInDir, convertUTCtoLocalTime, getCharacterIconPath } = require('./utils.js');
-
-const ProcessedFilesModule = (() => {
-    // Initialize an empty set to store processed file names
-    const processedFiles = new Set();
-
-    // Function to add a file to the set of processed files
-    const addProcessedFile = (fileName) => {
-        processedFiles.add(fileName);
-    };
-
-    // Function to check if a file has been processed
-    const hasProcessedFile = (fileName) => {
-        return processedFiles.has(fileName);
-    };
-
-    const processedFilesSize = () => {
-        return processedFiles.size;
-    }
-
-    // Return the public interface of the module
-    return {
-        addProcessedFile,
-        hasProcessedFile,
-        processedFilesSize
-    };
-})();
+const { ProcessedFilesModule } = require('./processedFilesModule.js');
 
 async function processFiles() {
     // Check if a folder is selected
@@ -110,7 +85,7 @@ async function processFiles() {
                         processedCount++;
                         filesProcessed++;
 
-                        ProcessedFilesModule.addProcessedFile(fileName);
+                        // ProcessedFilesModule.addProcessedFile(fileName); // now added in collapsible.js addGameDataToProcessedFiles
                         console.log(`File '${fileName}' processed successfully.`);
                     }
                     resolve();
@@ -132,6 +107,7 @@ async function processFiles() {
 }
 
 async function computeStats(gameFile, totalFiles, singlesChecked, startDate, endDate) {
+    // console.time('computeStats')
     const game = new SlippiGame(gameFile);
     const settings = game.getSettings();
 
@@ -231,7 +207,7 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
             const totalCount = successCount + actionCounts.lCancelCount.fail;
 
             if (totalCount === 0) {
-                return '0% (0 / 0)';
+                return 'N / A (0 / 0)';
             }
 
             return `${Math.round((successCount / totalCount) * 100)}% (${successCount} / ${totalCount})`;
@@ -251,6 +227,7 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
     }
     // const processedCount = document.getElementById('processed-count');
     // processedCount.textContent = `${parseInt(processedCount.textContent) + 1} / ${totalFiles}`;
+    // console.timeEnd('computeStats')
 
     // Indicate that the game was not skipped
     return 'processed';
@@ -413,13 +390,19 @@ function addPlayerData(table, label, data, settings) {
                 }
             });
             const lcancelsPercentages = data.map(item => {
-                const match = item.match(/\d+%/)
-                return match ? match[0] : null; // Return the matched percentage or null if not found
-            }).filter(Boolean);
+                if (item.includes('N / A')) {
+                    return 'N / A';
+                }            
+                const match = item.match(/\d+%/);
+
+                return match ? match[0] : null;
+            }).filter(Boolean);  // Filter out null or undefined values
+            
     
             lcancelsPercentages.forEach((percentage, index) => {
                 const teamColor = teamColors[index];
-                if (percentage === '0%') {
+                if (percentage === '0%' || percentage === 'N / A') {
+                    console.log('percentage: ' + percentage);
                     gradientWidth = '0%'; // Handle the zero attempts case
                 } else {
                     gradientWidth = percentage;
@@ -497,7 +480,193 @@ function appendTable(table) {
     tableContainer.appendChild(table);
 }
 
+function analyzeSession(filePath) {
+    const sortedProcessedFiles = ProcessedFilesModule.getSortedProcessedFiles();
+    const fileName = filePath.split('\\').pop();
+    const currentGame = sortedProcessedFiles.find(file => file.fileName === fileName);
+
+    if (!currentGame) {
+        console.log("Current game not found in processed files.");
+        return;
+    }
+
+    const currentConnectCodes = JSON.stringify(currentGame.data.connectCodes);
+
+    const sessionStats = {
+        connectCodes: [],
+        characterInfo: [],
+        overallRecord: {},
+        stageRecords: {},
+        characterCombinationRecords: {},
+        LRASCounts: {},
+        stageCharacterRecords: {}
+    };
+
+    const teamColorMapping = {
+        0: '#F15959', // Red for team 0
+        1: '#6565FE', // Blue for team 1
+        2: '#4CE44C', // Green for team 2
+    };
+
+    sortedProcessedFiles.forEach(game => {
+        if (JSON.stringify(game.data.connectCodes) === currentConnectCodes) {
+            const { connectCodes, characterInfo, stageId, winningTeamConnectCodes, losingTeamConnectCodes } = game.data;
+
+            // Push connect codes into sessionStats
+            connectCodes.forEach(code => {
+                if (!sessionStats.connectCodes.includes(code.connectCode)) {
+                    sessionStats.connectCodes.push(code.connectCode);
+                }
+            });
+
+            // Push character info
+            sessionStats.characterInfo.push(...characterInfo.map((info, index) => ({
+                connectCode: connectCodes[index].connectCode,
+                characterId: info.characterId,
+                color: info.color,
+                teamId: info.teamId
+            })));
+
+            const getPlayerCharacterMapping = () => {
+                return connectCodes.reduce((acc, player, index) => {
+                    const { characterId, color, teamId } = characterInfo[index];
+                    acc[player.connectCode] = { characterId, color, teamId };
+                    return acc;
+                }, {});
+            };
+
+            const characterCombinationMapping = getPlayerCharacterMapping();
+
+            const characterCombinationKey = JSON.stringify(characterCombinationMapping);
+
+            const winningTeam = winningTeamConnectCodes.join(',');
+            const losingTeam = losingTeamConnectCodes.join(',');
+
+            // Sort teams alphabetically
+            const teams = [winningTeam, losingTeam].sort();
+            const teamA = teams[0];
+            const teamB = teams[1];
+
+            // Get team colors
+            const getTeamColor = (teamConnectCodes) => {
+                const teamColor = connectCodes
+                    .filter(player => teamConnectCodes.includes(player.connectCode))
+                    .map(player => {
+                        const playerIndex = connectCodes.findIndex(c => c.connectCode === player.connectCode);
+                        const charInfo = characterInfo[playerIndex];
+                        return charInfo ? teamColorMapping[charInfo.teamId] : '#FFFFFF';
+                    })[0];
+                
+                return teamColor || '#FFFFFF';
+            };
+
+            const leftTeamColor = getTeamColor(teamA.split(','));
+            const rightTeamColor = getTeamColor(teamB.split(','));
+
+            // ------------------------ Overall Record --------------------------
+            if (!sessionStats.overallRecord[teamA]) {
+                sessionStats.overallRecord[teamA] = {};
+            }
+            if (!sessionStats.overallRecord[teamA][teamB]) {
+                sessionStats.overallRecord[teamA][teamB] = { wins: 0, losses: 0, teamColors: {} };
+            }
+
+            sessionStats.overallRecord[teamA][teamB].teamColors = {
+                leftTeamColor,
+                rightTeamColor
+            };
+
+            if (winningTeam === teamA) {
+                sessionStats.overallRecord[teamA][teamB].wins += 1;
+            } else {
+                sessionStats.overallRecord[teamA][teamB].losses += 1;
+            }
+
+            // ------------------------ Stage Records ----------------------------
+            if (!sessionStats.stageRecords[stageId]) {
+                sessionStats.stageRecords[stageId] = {};
+            }
+            if (!sessionStats.stageRecords[stageId][teamA]) {
+                sessionStats.stageRecords[stageId][teamA] = {};
+            }
+            if (!sessionStats.stageRecords[stageId][teamA][teamB]) {
+                sessionStats.stageRecords[stageId][teamA][teamB] = { wins: 0, losses: 0, teamColors: {} };
+            }
+
+            sessionStats.stageRecords[stageId][teamA][teamB].teamColors = {
+                leftTeamColor,
+                rightTeamColor
+            };
+
+            if (winningTeam === teamA) {
+                sessionStats.stageRecords[stageId][teamA][teamB].wins += 1;
+            } else {
+                sessionStats.stageRecords[stageId][teamA][teamB].losses += 1;
+            }
+
+            // ----------------- Character Combination Records -------------------
+            if (!sessionStats.characterCombinationRecords[characterCombinationKey]) {
+                sessionStats.characterCombinationRecords[characterCombinationKey] = {};
+            }
+            if (!sessionStats.characterCombinationRecords[characterCombinationKey][teamA]) {
+                sessionStats.characterCombinationRecords[characterCombinationKey][teamA] = {};
+            }
+            if (!sessionStats.characterCombinationRecords[characterCombinationKey][teamA][teamB]) {
+                sessionStats.characterCombinationRecords[characterCombinationKey][teamA][teamB] = { wins: 0, losses: 0, teamColors: {} };
+            }
+
+            sessionStats.characterCombinationRecords[characterCombinationKey][teamA][teamB].teamColors = {
+                leftTeamColor,
+                rightTeamColor
+            };
+
+            if (winningTeam === teamA) {
+                sessionStats.characterCombinationRecords[characterCombinationKey][teamA][teamB].wins += 1;
+            } else {
+                sessionStats.characterCombinationRecords[characterCombinationKey][teamA][teamB].losses += 1;
+            }
+
+            // -------------- Stage and Character Combination Records --------------
+            if (!sessionStats.stageCharacterRecords[stageId]) {
+                sessionStats.stageCharacterRecords[stageId] = {};
+            }
+            if (!sessionStats.stageCharacterRecords[stageId][characterCombinationKey]) {
+                sessionStats.stageCharacterRecords[stageId][characterCombinationKey] = {};
+            }
+            if (!sessionStats.stageCharacterRecords[stageId][characterCombinationKey][teamA]) {
+                sessionStats.stageCharacterRecords[stageId][characterCombinationKey][teamA] = {};
+            }
+            if (!sessionStats.stageCharacterRecords[stageId][characterCombinationKey][teamA][teamB]) {
+                sessionStats.stageCharacterRecords[stageId][characterCombinationKey][teamA][teamB] = { wins: 0, losses: 0, teamColors: {} };
+            }
+
+            sessionStats.stageCharacterRecords[stageId][characterCombinationKey][teamA][teamB].teamColors = {
+                leftTeamColor,
+                rightTeamColor
+            };
+
+            if (winningTeam === teamA) {
+                sessionStats.stageCharacterRecords[stageId][characterCombinationKey][teamA][teamB].wins += 1;
+            } else {
+                sessionStats.stageCharacterRecords[stageId][characterCombinationKey][teamA][teamB].losses += 1;
+            }
+
+        }
+    });
+
+    console.log("Overall Record:", sessionStats.overallRecord);
+    console.log("Stage Records:", sessionStats.stageRecords);
+    console.log("Character Combination Records:", sessionStats.characterCombinationRecords);
+    console.log("Stage and Character Records:", sessionStats.stageCharacterRecords);
+    console.log("LRAS Counts:", sessionStats.LRASCounts);
+
+    return sessionStats;
+}
+
+
 module.exports = {
+    // ProcessedFilesModule,
     processFiles,
-    computeStats
+    computeStats,
+    analyzeSession,  
 };

@@ -72,7 +72,7 @@ th {
 }
 
 .collapsible {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .collapsible-header {
@@ -81,8 +81,7 @@ th {
     justify-content: space-between;
     /* background-color: #444; */
     color: #eee;
-    padding: 10px;
-    padding-top: 0px;
+    padding: 7px;
     cursor: pointer;
     line-height: normal;
     transition: background-color 0.3s ease;
@@ -128,6 +127,83 @@ th {
 
 .play-icon:active {
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); /* Scale down and apply inset shadow */
+}
+
+.analyze-session-icon {
+    pointer-events: auto;
+    width: 24px;
+    height: 24px;
+    background-color: #4CAF50; /* Green circle */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: 10px;
+    position: absolute;
+    right: 40px;
+    top: 35%;
+    transform: translateY(-50%);
+    transition: filter 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+
+/* Bar graph inside the magnifying glass */
+.analyze-session-icon .bar-graph {
+    position: absolute;
+    width: 8px; /* Fits inside the circle */
+    height: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* Align bars from the bottom */
+}
+
+.analyze-session-icon .bar-graph .bar {
+    background-color: white;
+    width: 2px; /* Thin bars */
+}
+
+.analyze-session-icon .bar-graph .bar:nth-child(1) {
+    height: 40%;
+}
+
+.analyze-session-icon .bar-graph .bar:nth-child(2) {
+    height: 60%;
+}
+
+.analyze-session-icon .bar-graph .bar:nth-child(3) {
+    height: 100%;
+}
+
+/* Hover and active states */
+.analyze-session-icon:hover {
+    filter: brightness(1.2); /* Increase brightness */
+}
+
+.analyze-session-icon:active {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); /* Scale down and apply inset shadow */
+}
+
+/* Magnifying glass styling */
+.magnifying-glass {
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    border-radius: 50%;
+    position: relative;
+}
+
+/* Bar graph styling */
+.bar-graph {
+    position: absolute;
+    width: 8px; 
+    height: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.bar {
+    background-color: white;
+    width: 2px;
 }
 
 .file-name-span {
@@ -200,9 +276,8 @@ th {
 .character-icon {
     width: 24px;
     height: auto;
-    margin-top: 5px;
-    margin-left: 1px;
-    margin-right: 0px;
+    /* margin-top: 5px; */
+    /* margin-left: 1px; */
     transform: translateY(6px);
 }
 
