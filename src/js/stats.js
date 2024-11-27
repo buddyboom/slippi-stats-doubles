@@ -3,6 +3,7 @@ const { TeamColors } = require('./constants.js');
 const { createCollapsibleSection, appendCollapsibleSection } = require('./collapsible.js');
 const { getSelectedFolderFromLocalStorage, findFilesInDir, convertUTCtoLocalTime, getCharacterIconPath } = require('./utils.js');
 const { ProcessedFilesModule } = require('./processedFilesModule.js');
+const { net } = require('electron');
 
 async function processFiles() {
     // Check if a folder is selected
@@ -152,6 +153,7 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
 
     const filePath = game.getFilePath();
     const fileName = filePath.split('\\').pop(); // Assuming the path separator is '\' (backslash)
+    const frames = game.getFrames();
 
     // Create a collapsible container for this file's output
     const collapsibleSection = createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stockCounts, filePath);
@@ -187,11 +189,14 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
             playerCell.appendChild(connectCodeSpan);
         });
 
+        const damageMatrix = calculateDamageMatrix(frames, settings);
+
         // Add player data rows
         // addPlayerData(table, 'Character', settings.players.map(player => characters.getCharacterShortName(player.characterId)));
         addPlayerData(table, 'Stocks Remaining', stockCounts, settings);
         addPlayerData(table, 'KOs', stats.overall.map(playerStats => `${playerStats.killCount}`), settings);
         addPlayerData(table, 'Total Damage', stats.overall.map(playerStats => `${Math.round(playerStats.totalDamage)}`), settings);
+        addPlayerData(table, 'Damage Matrix', damageMatrix, settings);
         addPlayerData(table, 'Grabs', stats.actionCounts.map(actionCounts => 
             `${actionCounts.grabCount.success} / ${actionCounts.grabCount.fail + actionCounts.grabCount.success}`));
         addPlayerData(table, 'Throws (f / b / u / d)', stats.actionCounts.map(actionCounts => 
@@ -231,6 +236,76 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
 
     // Indicate that the game was not skipped
     return 'processed';
+}
+
+function calculateDamageMatrix(frames, settings) {
+    const damageMatrix = {};
+
+    // Initialize damage matrix
+    settings.players.forEach(player => {
+        const playerIndex = player.playerIndex;
+        damageMatrix[playerIndex] = {
+            totalDamage: 0,
+            damageToOpponents: 0,
+            damageToTeammates: 0,
+            damageReceived: 0,
+            dealtToPlayers: {} // Tracks damage dealt to each specific player
+        };
+
+        // Initialize dealtToPlayers for each opponent
+        settings.players.forEach(opponent => {
+            if (playerIndex !== opponent.playerIndex) {
+                damageMatrix[playerIndex].dealtToPlayers[opponent.playerIndex] = 0;
+            }
+        });
+    });
+
+    // Iterate through frames to track damage
+    Object.values(frames).forEach(frame => {
+        if (!frame || !frame.players) return;
+
+        settings.players.forEach(player => {
+            const playerIndex = player.playerIndex;
+            const currentPlayer = frame.players[playerIndex]?.post;
+            const lastPlayer = frame.players[playerIndex]?.pre;
+
+            if (!currentPlayer || !lastPlayer) return;
+
+            const { percent: postPercent, lastHitBy } = currentPlayer;
+            const { percent: prePercent } = lastPlayer;
+            const damageDealt = postPercent - prePercent;
+
+            if (damageDealt > 0 && lastHitBy >= 0 && lastHitBy !== playerIndex) {
+                const attackerIndex = lastHitBy;
+                const victimIndex = playerIndex;
+                const attacker = damageMatrix[attackerIndex];
+                const victim = damageMatrix[victimIndex];
+
+                if (!attacker || !victim) return;
+
+                // Update matrix for damage dealt and received
+                attacker.totalDamage += damageDealt;
+                victim.damageReceived += damageDealt;
+                attacker.dealtToPlayers[victimIndex] += damageDealt;
+
+                // Track team-specific damage
+                if (settings.players[attackerIndex].teamId === settings.players[victimIndex].teamId) {
+                    attacker.damageToTeammates += damageDealt;
+                } else {
+                    attacker.damageToOpponents += damageDealt;
+                }
+            }
+        });
+    });
+
+    // Calculate net damage
+    Object.values(damageMatrix).forEach(player => {
+        player.netDamage = player.damageToOpponents - player.damageToTeammates;
+    });
+
+    console.log(damageMatrix);
+
+    return damageMatrix;
 }
 
 // Function to add player data to the table
@@ -341,6 +416,71 @@ function addPlayerData(table, label, data, settings) {
                 cell.style.background = `linear-gradient(to top, ${gradientColor} ${gradientHeight}, transparent ${gradientHeight})`;
             });
             break;
+        case 'Damage Matrix':
+            table.deleteRow(row.rowIndex); // delete row inserted at start of function. otherwise, table would have row Damage Matrix [object Object]
+            const players = settings.players;
+            const damageMatrixRows = [];
+
+            // Total Damage Row
+            const totalRow = table.insertRow();
+            totalRow.insertCell().textContent = 'Total Damage (calc\'d)';
+            totalRow.style.cursor = 'pointer';
+            players.forEach(player => {
+                const totalDamage = data[player.playerIndex]?.totalDamage || 0;
+                totalRow.insertCell().textContent = totalDamage.toFixed(1);
+            });
+            // damageMatrixRows.push(totalRow);
+            applyRowShading(totalRow);
+
+            // Add functionality to toggle visibility of Damage Matrix rows
+            totalRow.addEventListener('click', () => {
+                damageMatrixRows.forEach(row => {
+                    row.classList.toggle('hidden');
+                });
+            });
+
+            // Net Damage Row
+            const netRow = table.insertRow();
+            netRow.classList.add('hidden');
+            netRow.insertCell().textContent = 'Net Damage';
+            players.forEach(player => {
+                const netDamage = data[player.playerIndex]?.netDamage || 0;
+                netRow.insertCell().textContent = netDamage.toFixed(1);
+            });
+            damageMatrixRows.push(netRow);
+            applyRowShading(netRow); 
+
+            // Damage Given Row
+            const givenRow = table.insertRow();
+            givenRow.classList.add('hidden');
+            givenRow.insertCell().textContent = 'Damage Given';
+            players.forEach(player => {
+                const givenToOthers = players.map(opponent => {
+                    if (opponent.playerIndex === player.playerIndex) return '-';
+                    const damage = data[player.playerIndex]?.dealtToPlayers[opponent.playerIndex] || 0;
+                    return damage.toFixed(1);
+                }).join(' | ');
+                givenRow.insertCell().textContent = givenToOthers;
+            });
+            damageMatrixRows.push(givenRow);
+            applyRowShading(givenRow); 
+
+            // Damage Received Row
+            const receivedRow = table.insertRow();
+            receivedRow.classList.add('hidden');
+            receivedRow.insertCell().textContent = 'Damage Received';
+            players.forEach(player => {
+                const receivedFromOthers = players.map(opponent => {
+                    if (opponent.playerIndex === player.playerIndex) return '-';
+                    const damage = data[opponent.playerIndex]?.dealtToPlayers[player.playerIndex] || 0;
+                    return damage.toFixed(1);
+                }).join(' | ');
+                receivedRow.insertCell().textContent = receivedFromOthers;
+            });
+            damageMatrixRows.push(receivedRow);
+            applyRowShading(receivedRow);
+            
+            break;
         case 'Stocks Remaining':
             const stocksRemaining = data;
     
@@ -402,7 +542,6 @@ function addPlayerData(table, label, data, settings) {
             lcancelsPercentages.forEach((percentage, index) => {
                 const teamColor = teamColors[index];
                 if (percentage === '0%' || percentage === 'N / A') {
-                    console.log('percentage: ' + percentage);
                     gradientWidth = '0%'; // Handle the zero attempts case
                 } else {
                     gradientWidth = percentage;
@@ -414,8 +553,16 @@ function addPlayerData(table, label, data, settings) {
             break;
     }
     
-    // Apply alternating row shades
-    const rowIndex = Array.from(table.rows).indexOf(row);
+    // Calculate the correct row index and apply alternating colors
+    const rows = Array.from(table.rows); // Get all rows in the table
+    const rowIndex = rows.indexOf(row); // Get the index of the current row
+    const isEvenRow = rowIndex % 2 === 0; // Check if the row index is even or odd
+    row.classList.add(isEvenRow ? 'table-row-even' : 'table-row-odd'); // Add appropriate class    
+}
+
+// Helper to apply alternating row shading
+function applyRowShading(row) {
+    const rowIndex = Array.from(row.parentNode.children).indexOf(row);
     const isEvenRow = rowIndex % 2 === 0;
     row.classList.add(isEvenRow ? 'table-row-even' : 'table-row-odd');
 }
