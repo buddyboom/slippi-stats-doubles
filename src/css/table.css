@@ -24,7 +24,7 @@ table {
 th, td {
     border: 1px solid #555;
     text-align: left;
-    padding: 8px;
+    padding: 7.5px;
     transition: border 0.3s ease;
 }
 

@@ -190,19 +190,21 @@ async function computeStats(gameFile, totalFiles, singlesChecked, startDate, end
         });
 
         const damageMatrix = calculateDamageMatrix(frames, settings);
+        const deathPercentsArray = getDeathPercents(frames, settings);
+        console.log("Death Percents for All Players:", deathPercentsArray);
 
         // Add player data rows
         // addPlayerData(table, 'Character', settings.players.map(player => characters.getCharacterShortName(player.characterId)));
         addPlayerData(table, 'Stocks Remaining', stockCounts, settings);
         addPlayerData(table, 'KOs', stats.overall.map(playerStats => `${playerStats.killCount}`), settings);
-        addPlayerData(table, 'Total Damage', stats.overall.map(playerStats => `${Math.round(playerStats.totalDamage)}`), settings);
+        // addPlayerData(table, 'Total Damage', stats.overall.map(playerStats => `${Math.round(playerStats.totalDamage)}`), settings); // removed for more accurate calc'd damage
         addPlayerData(table, 'Damage Matrix', damageMatrix, settings);
         addPlayerData(table, 'Grabs', stats.actionCounts.map(actionCounts => 
             `${actionCounts.grabCount.success} / ${actionCounts.grabCount.fail + actionCounts.grabCount.success}`));
         addPlayerData(table, 'Throws (f / b / u / d)', stats.actionCounts.map(actionCounts => 
             `${actionCounts.throwCount.forward + actionCounts.throwCount.back + actionCounts.throwCount.up + actionCounts.throwCount.down} 
             (${actionCounts.throwCount.forward} / ${actionCounts.throwCount.back} / ${actionCounts.throwCount.up} / ${actionCounts.throwCount.down})`));
-        addPlayerData(table, 'Roll / Air Dodge / Spotdodge', stats.actionCounts.map(actionCounts => 
+        addPlayerData(table, 'Roll / Air Dodge / Spot Dodge', stats.actionCounts.map(actionCounts => 
             `${actionCounts.rollCount} / ${actionCounts.airDodgeCount} / ${actionCounts.spotDodgeCount}`));
         addPlayerData(table, 'WD / WL / DD / Ledgegrab', stats.actionCounts.map(actionCounts => 
             `${actionCounts.wavedashCount} / ${actionCounts.wavelandCount} / ${actionCounts.dashDanceCount} / ${actionCounts.ledgegrabCount}`));
@@ -303,9 +305,57 @@ function calculateDamageMatrix(frames, settings) {
         player.netDamage = player.damageToOpponents - player.damageToTeammates;
     });
 
-    console.log(damageMatrix);
-
     return damageMatrix;
+}
+
+function getDeathPercents(frames, settings) {
+    const deathPercents = {};
+    const lastStockCounts = {}; // Track previous stock counts per player
+
+    // Initialize data for each player
+    settings.players.forEach(player => {
+        deathPercents[player.playerIndex] = [];
+        lastStockCounts[player.playerIndex] = null; // Store previous stock count
+    });
+
+    // Iterate through each frame
+    Object.values(frames).forEach(frame => {
+        settings.players.forEach(player => {
+            const playerIndex = player.playerIndex;
+            const playerData = frame.players?.[playerIndex]?.post;
+
+            if (!playerData) return;
+
+            const currentStocks = playerData.stocksRemaining;
+            const previousStocks = lastStockCounts[playerIndex];
+
+            // First frame initialization
+            if (previousStocks === null) {
+                lastStockCounts[playerIndex] = currentStocks;
+                return;
+            }
+
+            // Detect a teammate's stock steal
+            const teammates = settings.players.filter(p => p.teamId === player.teamId && p.playerIndex !== playerIndex);
+            const teammateStoleStock = teammates.some(teammate => {
+                const teammateIndex = teammate.playerIndex;
+                const teammatePreviousStocks = lastStockCounts[teammateIndex];
+                const teammateCurrentStocks = frame.players?.[teammateIndex]?.post?.stocksRemaining;
+
+                return teammatePreviousStocks === 0 && teammateCurrentStocks > 0; // Teammate re-entered
+            });
+
+            // If stock decreased and no teammate stole a stock, it's a real death
+            if (currentStocks < previousStocks && !teammateStoleStock) {
+                deathPercents[playerIndex].push(Math.round(playerData.percent * 10) / 10);
+            }
+
+            // Update last stock count for next frame
+            lastStockCounts[playerIndex] = currentStocks;
+        });
+    });
+
+    return deathPercents;
 }
 
 // Function to add player data to the table
@@ -382,55 +432,105 @@ function addPlayerData(table, label, data, settings) {
                 // valueCells[index].appendChild(countSpan);
             });
             break;
-        case 'Total Damage':
-            teamColors = settings.players.map(player => {
-                switch (player.teamId) {
-                    case 0: // RED
-                        return '#F15959';
-                    case 1: // BLU
-                        return '#6565FE';
-                    case 2: // GRN
-                        return '#4CE44C';
-                    default:
-                        return '#000000'; // Default to black if unknown team
-                }
-            });
-            // Calculate the total damage for each team
-            const teamTotalDamage = {};
-            for (const [index, playerDamage] of data.entries()) {
-                const teamColor = teamColors[index];
-                if (!(teamColor in teamTotalDamage)) {
-                    teamTotalDamage[teamColor] = 0;
-                }
-                teamTotalDamage[teamColor] += parseInt(playerDamage);
-            }
+        // case 'Total Damage':
+        //     teamColors = settings.players.map(player => {
+        //         switch (player.teamId) {
+        //             case 0: // RED
+        //                 return '#F15959';
+        //             case 1: // BLU
+        //                 return '#6565FE';
+        //             case 2: // GRN
+        //                 return '#4CE44C';
+        //             default:
+        //                 return '#000000'; // Default to black if unknown team
+        //         }
+        //     });
+            // // Calculate the total damage for each team
+            // const teamTotalDamage = {};
+            // for (const [index, playerDamage] of data.entries()) {
+            //     const teamColor = teamColors[index];
+            //     if (!(teamColor in teamTotalDamage)) {
+            //         teamTotalDamage[teamColor] = 0;
+            //     }
+            //     teamTotalDamage[teamColor] += parseInt(playerDamage);
+            // }
         
-            // Apply background gradient based on percentage of team damage
-            valueCells.forEach((cell, index) => {
-                const teamColor = teamColors[index];
-                const playerDamage = parseInt(data[index]);
-                const teamTotal = teamTotalDamage[teamColor];
-                const percentage = (playerDamage / teamTotal) * 100;
-                const gradientHeight = `${percentage}%`;
-                const gradientColor = `rgba(${parseInt(teamColor.substring(1, 3), 16)}, ${parseInt(teamColor.substring(3, 5), 16)}, ${parseInt(teamColor.substring(5, 7), 16)}, 0.3)`;
-                cell.style.background = `linear-gradient(to top, ${gradientColor} ${gradientHeight}, transparent ${gradientHeight})`;
-            });
-            break;
-        case 'Damage Matrix':
-            table.deleteRow(row.rowIndex); // delete row inserted at start of function. otherwise, table would have row Damage Matrix [object Object]
-            const players = settings.players;
-            const damageMatrixRows = [];
+            // // Apply background gradient based on percentage of team damage
+            // valueCells.forEach((cell, index) => {
+            //     const teamColor = teamColors[index];
+            //     const playerDamage = parseInt(data[index]);
+            //     const teamTotal = teamTotalDamage[teamColor];
+            //     const percentage = (playerDamage / teamTotal) * 100;
+            //     const gradientHeight = `${percentage}%`;
+            //     const gradientColor = `rgba(${parseInt(teamColor.substring(1, 3), 16)}, ${parseInt(teamColor.substring(3, 5), 16)}, ${parseInt(teamColor.substring(5, 7), 16)}, 0.3)`;
+            //     cell.style.background = `linear-gradient(to top, ${gradientColor} ${gradientHeight}, transparent ${gradientHeight})`;
+            // });
+            // break;
+            case 'Damage Matrix':
+                table.deleteRow(row.rowIndex); // Remove the initial row
+            
+                const players = settings.players;
+                const damageMatrixRows = [];
+            
+                // Get team colors
+                teamColors = settings.players.map(player => {
+                    switch (player.teamId) {
+                        case 0: // RED
+                            return '#F15959';
+                        case 1: // BLU
+                            return '#6565FE';
+                        case 2: // GRN
+                            return '#4CE44C';
+                        default:
+                            return '#000000'; // Default to black if unknown team
+                    }
+                });
 
-            // Total Damage Row
-            const totalRow = table.insertRow();
-            totalRow.insertCell().textContent = 'Total Damage (calc\'d)';
-            totalRow.style.cursor = 'pointer';
-            players.forEach(player => {
-                const totalDamage = data[player.playerIndex]?.totalDamage || 0;
-                totalRow.insertCell().textContent = totalDamage.toFixed(1);
-            });
-            // damageMatrixRows.push(totalRow);
-            applyRowShading(totalRow);
+                // Calculate total team damage
+                let maxValue = -1;
+                const teamTotalDamage = {};
+                players.forEach(player => {
+                    const playerIndex = player.playerIndex;
+                    const playerDamage = data[playerIndex]?.totalDamage || 0;
+                    const teamColor = teamColors[playerIndex];
+                    if (!(teamColor in teamTotalDamage)) {
+                        teamTotalDamage[teamColor] = 0;
+                    }
+                    teamTotalDamage[teamColor] += playerDamage;
+
+                    if(playerDamage > maxValue) {
+                        maxValue = playerDamage;
+                    }
+                });
+            
+                // Total Damage Row
+                const totalRow = table.insertRow();
+                const labelCell = totalRow.insertCell();
+                labelCell.textContent = "Total Damage";
+                labelCell.style.fontWeight = 'bold'; // Bold text for the label
+                totalRow.style.cursor = 'pointer'; // Make the row clickable
+                
+                players.forEach((player, index) => {
+                    const totalDamage = data[player.playerIndex]?.totalDamage || 0;
+                    const cell = totalRow.insertCell();
+                    cell.textContent = totalDamage.toFixed(1);
+
+                    // Check if this cell has the maximum value and apply the gold-text class
+                    if (totalDamage === maxValue) {
+                        cell.classList.add('gold-text');
+                    }
+            
+                    // Apply gradient styling
+                    const teamColor = teamColors[index];
+                    const teamTotal = teamTotalDamage[teamColor];
+                    const percentage = (totalDamage / teamTotal) * 100;
+                    const gradientHeight = `${percentage}%`;
+                    const gradientColor = `rgba(${parseInt(teamColor.substring(1, 3), 16)}, 
+                                                ${parseInt(teamColor.substring(3, 5), 16)}, 
+                                                ${parseInt(teamColor.substring(5, 7), 16)}, 0.3)`;
+                    cell.style.background = `linear-gradient(to top, ${gradientColor} ${gradientHeight}, transparent ${gradientHeight})`;
+                });
+                applyRowShading(totalRow);
 
             // Add functionality to toggle visibility of Damage Matrix rows
             totalRow.addEventListener('click', () => {
@@ -454,32 +554,139 @@ function addPlayerData(table, label, data, settings) {
             const givenRow = table.insertRow();
             givenRow.classList.add('hidden');
             givenRow.insertCell().textContent = 'Damage Given';
+
             players.forEach(player => {
-                const givenToOthers = players.map(opponent => {
-                    if (opponent.playerIndex === player.playerIndex) return '-';
-                    const damage = data[player.playerIndex]?.dealtToPlayers[opponent.playerIndex] || 0;
-                    return damage.toFixed(1);
-                }).join(' | ');
-                givenRow.insertCell().textContent = givenToOthers;
+                const givenCell = givenRow.insertCell();
+                givenCell.classList.add(`team-${teamColors[player.playerIndex]}`); // Apply team class for styling
+                givenCell.style.position = 'relative'; // Needed for absolute positioning of bar
+
+                // Calculate total damage given by this player
+                const totalDamageGiven = players.reduce((sum, opponent) => 
+                    sum + (opponent.playerIndex !== player.playerIndex ? 
+                        (data[player.playerIndex]?.dealtToPlayers[opponent.playerIndex] || 0) : 0), 0);
+
+                // Background bar (applies to the entire cell)
+                const bar = document.createElement('div');
+                bar.style.position = 'absolute';
+                bar.style.bottom = '0';
+                bar.style.left = '0';
+                bar.style.width = '100%';
+                bar.style.height = '100%'; // Extend to full cell height
+                bar.style.display = 'flex';
+                bar.style.alignItems = 'flex-end'; // Align inner bars to bottom
+                bar.style.zIndex = '0';
+
+                // Fill the bar with percentage-based segments for Damage Given
+                players.forEach(opponent => {
+                    const damage = (opponent.playerIndex === player.playerIndex) ? 0 : 
+                        (data[player.playerIndex]?.dealtToPlayers[opponent.playerIndex] || 0);
+                    const percentage = totalDamageGiven > 0 ? (damage / totalDamageGiven) * 100 : 0;
+
+                    const segment = document.createElement('div');
+                    segment.style.flex = '1';
+                    segment.style.height = `${percentage}%`;
+                    segment.style.backgroundColor = teamColors[player.playerIndex] + '50'; // 50% opacity (player's team color)
+                    segment.style.borderRight = '1px solid rgba(255,255,255,0.2)'; // Subtle separator
+
+                    bar.appendChild(segment);
+                });
+
+                // Text layer for Damage Given, now occupying full width of the cell
+                const textContainer = document.createElement('div');
+                textContainer.style.position = 'absolute';
+                textContainer.style.display = 'flex'; // Use flexbox for equal spacing
+                textContainer.style.width = '100%'; // Ensure it takes up the full width of the cell
+                textContainer.style.left = '0px';
+                textContainer.style.bottom = '0px';
+                textContainer.style.height = '75%'; // Keep text positioned properly within cell
+
+                players.forEach(opponent => {
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = (opponent.playerIndex === player.playerIndex) ? '-' : 
+                        (data[player.playerIndex]?.dealtToPlayers[opponent.playerIndex] || 0).toFixed(1);
+                    textSpan.style.textAlign = 'center';
+                    textSpan.style.flex = '1'; // Make each span take up equal space in the container
+                    textSpan.style.zIndex = '1'; // Keeps text above background
+                    textContainer.appendChild(textSpan);
+                });
+
+                // Add both bar and text container to the cell
+                givenCell.appendChild(bar);
+                givenCell.appendChild(textContainer); // Append the text container instead of a single span
             });
+
             damageMatrixRows.push(givenRow);
-            applyRowShading(givenRow); 
+            applyRowShading(givenRow);
+
 
             // Damage Received Row
             const receivedRow = table.insertRow();
             receivedRow.classList.add('hidden');
             receivedRow.insertCell().textContent = 'Damage Received';
+
             players.forEach(player => {
-                const receivedFromOthers = players.map(opponent => {
-                    if (opponent.playerIndex === player.playerIndex) return '-';
-                    const damage = data[opponent.playerIndex]?.dealtToPlayers[player.playerIndex] || 0;
-                    return damage.toFixed(1);
-                }).join(' | ');
-                receivedRow.insertCell().textContent = receivedFromOthers;
+                const receivedCell = receivedRow.insertCell();
+                receivedCell.classList.add(`team-${teamColors[player.playerIndex]}`); // Apply team class for styling
+                receivedCell.style.position = 'relative'; // Needed for absolute positioning of bar
+
+                // Calculate total damage received by this player
+                const totalDamageReceived = players.reduce((sum, opponent) => 
+                    sum + (opponent.playerIndex !== player.playerIndex ? 
+                        (data[opponent.playerIndex]?.dealtToPlayers[player.playerIndex] || 0) : 0), 0);
+
+                // Background bar (applies to the entire cell)
+                const bar = document.createElement('div');
+                bar.style.position = 'absolute';
+                bar.style.bottom = '0';
+                bar.style.left = '0';
+                bar.style.width = '100%';
+                bar.style.height = '100%'; // Extend to full cell height
+                bar.style.display = 'flex';
+                bar.style.alignItems = 'flex-end'; // Align inner bars to bottom
+                bar.style.zIndex = '0';
+
+                // Fill the bar with percentage-based segments for Damage Received
+                players.forEach(opponent => {
+                    const damage = (opponent.playerIndex === player.playerIndex) ? 0 : 
+                        (data[opponent.playerIndex]?.dealtToPlayers[player.playerIndex] || 0);
+                    const percentage = totalDamageReceived > 0 ? (damage / totalDamageReceived) * 100 : 0;
+
+                    const segment = document.createElement('div');
+                    segment.style.flex = '1';
+                    segment.style.height = `${percentage}%`;
+                    segment.style.backgroundColor = teamColors[opponent.playerIndex] + '50'; // 50% opacity (opponent's team color)
+                    segment.style.borderRight = '1px solid rgba(255,255,255,0.2)'; // Subtle separator
+
+                    bar.appendChild(segment);
+                });
+
+                // Text layer for Damage Received, now occupying full width of the cell
+                const textContainer = document.createElement('div');
+                textContainer.style.position = 'absolute';
+                textContainer.style.display = 'flex'; // Use flexbox for equal spacing
+                textContainer.style.width = '100%'; // Ensure it takes up the full width of the cell
+                textContainer.style.left = '0px';
+                textContainer.style.bottom = '0px';
+                textContainer.style.height = '75%'; // Keep text positioned properly within cell
+
+                players.forEach(opponent => {
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = (opponent.playerIndex === player.playerIndex) ? '-' : 
+                        (data[opponent.playerIndex]?.dealtToPlayers[player.playerIndex] || 0).toFixed(1);
+                    textSpan.style.textAlign = 'center';
+                    textSpan.style.flex = '1'; // Make each span take up equal space in the container
+                    textSpan.style.zIndex = '1'; // Keeps text above background
+                    textContainer.appendChild(textSpan);
+                });
+
+                // Add both bar and text container to the cell
+                receivedCell.appendChild(bar);
+                receivedCell.appendChild(textContainer); // Append the text container instead of a single span
             });
+
             damageMatrixRows.push(receivedRow);
             applyRowShading(receivedRow);
-            
+
             break;
         case 'Stocks Remaining':
             const stocksRemaining = data;
@@ -558,6 +765,87 @@ function addPlayerData(table, label, data, settings) {
     const rowIndex = rows.indexOf(row); // Get the index of the current row
     const isEvenRow = rowIndex % 2 === 0; // Check if the row index is even or odd
     row.classList.add(isEvenRow ? 'table-row-even' : 'table-row-odd'); // Add appropriate class    
+}
+
+function createDamageRow(label, isDamageGiven) {
+    const row = table.insertRow();
+    row.classList.add('hidden');
+    row.insertCell().textContent = label;
+
+    players.forEach(player => {
+        const cell = row.insertCell();
+        cell.classList.add(`team-${teamColors[player.playerIndex]}`); // Apply team class for styling
+        cell.style.position = 'relative'; // Needed for absolute positioning of bar
+
+        // Calculate total damage for this player
+        const totalDamage = players.reduce((sum, opponent) => 
+            sum + (opponent.playerIndex !== player.playerIndex ? 
+                (isDamageGiven 
+                    ? (data[player.playerIndex]?.dealtToPlayers[opponent.playerIndex] || 0) 
+                    : (data[opponent.playerIndex]?.dealtToPlayers[player.playerIndex] || 0)
+                ) 
+                : 0), 0
+        );
+
+        // Background bar (applies to the entire cell)
+        const bar = document.createElement('div');
+        bar.style.position = 'absolute';
+        bar.style.bottom = '0';
+        bar.style.left = '0';
+        bar.style.width = '100%';
+        bar.style.height = '100%'; // Extend to full cell height
+        bar.style.display = 'flex';
+        bar.style.alignItems = 'flex-end'; // Align inner bars to bottom
+        bar.style.zIndex = '0';
+
+        // Fill the bar with percentage-based segments
+        players.forEach(opponent => {
+            const damage = (opponent.playerIndex === player.playerIndex) ? 0 : 
+                (isDamageGiven 
+                    ? (data[player.playerIndex]?.dealtToPlayers[opponent.playerIndex] || 0) 
+                    : (data[opponent.playerIndex]?.dealtToPlayers[player.playerIndex] || 0)
+                );
+
+            const percentage = totalDamage > 0 ? (damage / totalDamage) * 100 : 0;
+
+            const segment = document.createElement('div');
+            segment.style.flex = '1';
+            segment.style.height = `${percentage}%`;
+            segment.style.backgroundColor = (isDamageGiven ? teamColors[player.playerIndex] : teamColors[opponent.playerIndex]) + '50'; // 50% opacity
+            segment.style.borderRight = '1px solid rgba(255,255,255,0.2)'; // Subtle separator
+
+            bar.appendChild(segment);
+        });
+
+        // Text layer, now occupying full width of the cell
+        const textContainer = document.createElement('div');
+        textContainer.style.position = 'absolute';
+        textContainer.style.display = 'flex'; // Use flexbox for equal spacing
+        textContainer.style.width = '100%'; // Ensure it takes up the full width of the cell
+        textContainer.style.left = '0px';
+        textContainer.style.bottom = '0px';
+        textContainer.style.height = '75%'; // Keep text positioned properly within cell
+
+        players.forEach(opponent => {
+            const textSpan = document.createElement('span');
+            textSpan.textContent = (opponent.playerIndex === player.playerIndex) ? '-' : 
+                (isDamageGiven 
+                    ? (data[player.playerIndex]?.dealtToPlayers[opponent.playerIndex] || 0).toFixed(1) 
+                    : (data[opponent.playerIndex]?.dealtToPlayers[player.playerIndex] || 0).toFixed(1)
+                );
+            textSpan.style.textAlign = 'center';
+            textSpan.style.flex = '1'; // Make each span take up equal space in the container
+            textSpan.style.zIndex = '1'; // Keeps text above background
+            textContainer.appendChild(textSpan);
+        });
+
+        // Add both bar and text container to the cell
+        cell.appendChild(bar);
+        cell.appendChild(textContainer);
+    });
+
+    damageMatrixRows.push(row);
+    applyRowShading(row);
 }
 
 // Helper to apply alternating row shading
@@ -797,7 +1085,6 @@ function analyzeSession(filePath) {
             } else {
                 sessionStats.stageCharacterRecords[stageId][characterCombinationKey][teamA][teamB].losses += 1;
             }
-
         }
     });
 
@@ -809,7 +1096,6 @@ function analyzeSession(filePath) {
 
     return sessionStats;
 }
-
 
 module.exports = {
     // ProcessedFilesModule,

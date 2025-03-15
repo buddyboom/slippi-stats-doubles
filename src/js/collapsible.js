@@ -33,7 +33,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
             });
         }
 
-        let LRASplayerIndex;
+        const lrasTracker = { index: null };
 
         // Construct header text with date, time, Connect Code, and stage
         const connectCodes = settings.players.map((player, index) => {
@@ -41,7 +41,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
             const connectCode = player.connectCode;
 
             // Add to player's oval yellow outline (winner) or faded (isLRASinitator) if applicable
-            teamColorClass = applyGameEndClass(gameEnd, teamColorClass, winningTeamColor, index, isLRASInitiator, LRASplayerIndex);
+            teamColorClass = applyGameEndClass(gameEnd, teamColorClass, winningTeamColor, index, isLRASInitiator, lrasTracker);
 
             const characterIconImg = createCharacterIcon(player.characterId, player.characterColor);
 
@@ -132,7 +132,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
         collapsibleDiv.appendChild(headerDiv);
         collapsibleDiv.appendChild(bodyDiv);
 
-        addGameDataToProcessedFiles(metadata.startAt, settings, gameEnd, stockCounts, filePath, stage, LRASplayerIndex)        
+        addGameDataToProcessedFiles(metadata.startAt, settings, gameEnd, stockCounts, filePath, lrasTracker)        
 
         return collapsibleDiv;
     } else {
@@ -140,7 +140,7 @@ function createCollapsibleSection(metadata, settings, gameEnd, latestFrame, stoc
     }
 }
 
-function applyGameEndClass(gameEnd, teamColorClass, winningTeamColor, index, isLRASInitiator, LRASplayerIndex) {
+function applyGameEndClass(gameEnd, teamColorClass, winningTeamColor, index, isLRASInitiator, lrasTracker) {
     if (gameEnd != null) {
         switch (gameEnd.gameEndMethod) {
             case 3: // GAME! team battle
@@ -151,8 +151,8 @@ function applyGameEndClass(gameEnd, teamColorClass, winningTeamColor, index, isL
             case 7: // No Contest
                 if (isLRASInitiator(gameEnd, index)) {
                     teamColorClass += '-faded'; // Add 'faded' class if the player is the LRAS initiator
-                    LRASplayerIndex = index; // TODO when i try 'return teamColorClass, LRASplayerIndex' both them become undefined
-                    console.log('LRASplayerIndex: '+LRASplayerIndex);
+                    lrasTracker.index = index; // TODO when i try 'return teamColorClass, LRASplayerIndex' both them become undefined
+                    console.log('LRASplayerIndex: '+lrasTracker.index);
                 }
                 break;
             default:
@@ -217,12 +217,11 @@ function createConnectCodeLink(connectCode, teamIdOrColorClass) {
     return connectCodeLink;
 }
 
-function addGameDataToProcessedFiles(startAt, settings, gameEnd, stockCounts, filePath, stage, LRASplayerIndex) {
+function addGameDataToProcessedFiles(startAt, settings, gameEnd, stockCounts, filePath, lrasTracker) {
     const gameData = {
         connectCodes: [],
         characterInfo: [],
         gameTimestamp: new Date(startAt),
-        // stage: stage,
         stageId: settings.stageId,
         LRASplayer: '',
         winningTeamConnectCodes: [],
@@ -249,9 +248,9 @@ function addGameDataToProcessedFiles(startAt, settings, gameEnd, stockCounts, fi
     });
 
     // Determine the winning team based on the remaining stocks
-    console.log('addGameDataToProcessedFiles LRASplayerIndex: '+LRASplayerIndex);
-    if (LRASplayerIndex) {
-        gameData.LRASplayer = LRASplayerIndex;
+    console.log('addGameDataToProcessedFiles LRASplayerIndex: '+lrasTracker.index);
+    if (lrasTracker.index !== null) {
+        gameData.LRASplayer = lrasTracker.index;
     } else if (gameEnd && gameEnd.gameEndMethod === 3) {
         let winningTeamId = null;
         for (const teamId in teams) {
@@ -305,7 +304,7 @@ function highlightMatchingColumns() {
         }
 
         if(!input) {
-            console.log('highlightMatchingColumns: Input is blank');
+            // console.log('highlightMatchingColumns: Input is blank');
             return;
         }
 
@@ -542,7 +541,6 @@ function createSessionModal(sessionData) {
     const sessionTitleContainer = document.createElement('div');
     sessionTitleContainer.classList.add('session-title-container');
 
-    
     const uniqueConnectCodes = [...new Set(sessionData.connectCodes)];
     const sessionTitle = document.createElement('h1');
     sessionTitle.textContent = `Session: ${uniqueConnectCodes.join(' ')}`;
